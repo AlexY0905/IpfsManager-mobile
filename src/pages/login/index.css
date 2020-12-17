@@ -1,0 +1,41 @@
+.am-list-item .am-input-label.am-input-label-5 {
+  width: 55px !important;
+}
+
+.login {
+  width: 100%;
+}
+
+.login_wrap {
+  width           : 80%;
+  position        : absolute;
+  top             : 50%;
+  left            : 50%;
+  transform       : translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.2);
+  box-shadow      : 0 5px 5px rgba(0, 0, 0, 0.3);
+  border-radius   : 10px;
+}
+
+.login_wrap .box-ipt {
+  width        : 80%;
+  border-radius: 10px;
+  margin       : 30px auto;
+}
+
+.login_wrap .title_wrap {
+  font-size  : 20px;
+  color      : #1890ff;
+  margin-top : 20px;
+  font-weight: 700;
+}
+
+.goRegister_wrap {
+  display        : flex;
+  justify-content: center;
+  margin-bottom  : 30px;
+}
+
+.goRegister_wrap a {
+  color: #1890ff;
+}
