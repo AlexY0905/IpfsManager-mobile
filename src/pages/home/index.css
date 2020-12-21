@@ -6,3 +6,7 @@
     visibility: hidden;
     clear: both;
 }
+.am-list-content {
+    text-overflow: unset !important;
+    overflow-x: scroll !important;
+}

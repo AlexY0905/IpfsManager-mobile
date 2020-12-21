@@ -24,8 +24,10 @@ class HomeList extends Component {
             isShowSearch: false,
             isSearchShow: false,
             isShowSectorBtn: false,
+            isShowFindBtn: false,
             sectorAddress: '',
-            sectorNumber: ''
+            sectorNumber: '',
+            searchVal: ''
         }
         this.onOpenChange = this.onOpenChange.bind(this)
         this.handleServerBtn = this.handleServerBtn.bind(this)
@@ -35,6 +37,8 @@ class HomeList extends Component {
         this.numberChange = this.numberChange.bind(this)
         this.handleSubmitSearch = this.handleSubmitSearch.bind(this)
         this.onCloseSectorModal = this.onCloseSectorModal.bind(this)
+        this.handleSearchFindBtn = this.handleSearchFindBtn.bind(this)
+        this.handleFindBtnChange = this.handleFindBtnChange.bind(this)
     }
     componentDidMount() {
         // 在生命周期调用发送方的数据
@@ -48,79 +52,74 @@ class HomeList extends Component {
         let options = {
             name: ''
         }
-
         switch (type) {
             case 'list':
                 options.name = 'lotuswalletlist'
-                this.setState({ isShowSearch: false, isShowSectorBtn: false })
-                break
-            case 'query-ask':
-                options.name = 'lotusclientqueryask'
-                this.setState({ isShowSearch: false, isShowSectorBtn: false })
+                this.setState({ isShowSearch: false, isShowSectorBtn: false, isShowFindBtn: false })
                 break
             case 'list-deals':
                 options.name = 'lotusclientlistdeals'
-                this.setState({ isShowSearch: false, isShowSectorBtn: false })
+                this.setState({ isShowSearch: false, isShowSectorBtn: false, isShowFindBtn: false })
                 break
             case 'pending':
                 options.name = 'lotusmpoolpending'
-                this.setState({ isShowSearch: false, isShowSectorBtn: false })
+                this.setState({ isShowSearch: false, isShowSectorBtn: false, isShowFindBtn: false })
                 break
             case 'find':
                 options.name = 'lotusmpoolfind'
-                this.setState({ isShowSearch: false, isShowSectorBtn: false })
+                this.setState({ modalOrder: 'lotusmpoolfind', isShowSearch: true, isShowSectorBtn: false, isShowFindBtn: true })
                 break
             case 'config':
                 options.name = 'lotusmpoolconfig'
-                this.setState({ isShowSearch: false, isShowSectorBtn: false })
+                this.setState({ isShowSearch: false, isShowSectorBtn: false, isShowFindBtn: false })
                 break
             case 'gas-perf':
                 options.name = 'lotusmpoolgasperf'
-                this.setState({ isShowSearch: false, isShowSectorBtn: false })
+                this.setState({ isShowSearch: false, isShowSectorBtn: false, isShowFindBtn: false })
                 break
             case 'power':
                 options.name = 'lotusstatepower'
-                this.setState({ isShowSearch: false, isShowSectorBtn: false })
+                this.setState({ isShowSearch: false, isShowSectorBtn: false, isShowFindBtn: false })
                 break
             case 'active-sectors':
                 options.name = 'lotusstateactivesectors'
-                this.setState({ isShowSearch: false, isShowSectorBtn: false })
-                break
+                this.setState({ modalOrder: 'lotusstateactivesectors', isShowSearch: true, isShowSectorBtn: false, isShowFindBtn: false })
+                return false
             case 'list-actors':
                 options.name = 'lotusstatelistactors'
-                this.setState({ modalOrder: 'lotusstatelistactors', isShowSearch: true, isShowSectorBtn: false })
+                this.setState({ modalOrder: 'lotusstatelistactors', isShowSearch: true, isShowSectorBtn: false, isShowFindBtn: false })
                 return false
             case 'list-miners':
                 options.name = 'lotusstatelistminers'
-                this.setState({ modalOrder: 'lotusstatelistminers', isShowSearch: true, isShowSectorBtn: true })
+                this.setState({ modalOrder: 'lotusstatelistminers', isShowSearch: true, isShowSectorBtn: true, isShowFindBtn: false })
                 return false
             case 'get-actor':
                 options.name = 'lotusstategetactor'
-                this.setState({ isShowSearch: false, isShowSectorBtn: false })
+                this.setState({ isShowSearch: false, isShowSectorBtn: false, isShowFindBtn: false })
                 break
             case 'miner-info':
                 options.name = 'lotusstateminerinfo'
-                this.setState({ isShowSearch: false, isShowSectorBtn: false })
+                this.setState({ isShowSearch: false, isShowSectorBtn: false, isShowFindBtn: false })
                 break
             case 'sector':
                 options.name = 'lotusstatesector'
-                this.setState({ modalOrder: 'lotusstatesector', visible: true })
+                this.setState({ modalOrder: 'lotusstatesector', visible: true, isShowFindBtn: false })
                 return false
             case 'read-state':
                 options.name = 'lotusstatereadstate'
-                this.setState({ modalOrder: 'lotusstatereadstate', isShowSearch: true, isShowSectorBtn: false })
+                this.setState({ modalOrder: 'lotusstatereadstate', isShowSearch: true, isShowSectorBtn: false, isShowFindBtn: false })
                 return false
             case 'getblock':
                 options.name = 'lotuschaingetblock'
-                this.setState({ modalOrder: 'lotuschaingetblock', isShowSearch: true, isShowSectorBtn: false })
+                this.setState({ modalOrder: 'lotuschaingetblock', isShowSearch: true, isShowSectorBtn: false, isShowFindBtn: false })
                 break
             case 'getmessage':
                 options.name = 'lotuschaingetmessage'
-                this.setState({ modalOrder: 'lotuschaingetmessage', isShowSearch: true, isShowSectorBtn: false })
-                break
+                this.setState({ modalOrder: 'lotuschaingetmessage', isShowSearch: true, isShowSectorBtn: false, isShowFindBtn: false })
+                return false
             case 'gas-price':
                 options.name = 'lotuschaingasprice'
-                this.setState({ modalOrder: 'lotuschaingasprice', isShowSearch: true, isShowSectorBtn: false })
+                this.setState({ modalOrder: 'lotuschaingasprice', isShowSearch: true, isShowSectorBtn: false, isShowFindBtn: false })
                 return false
         }
 
@@ -134,16 +133,21 @@ class HomeList extends Component {
             modalType: type
         })
     }
-
     handleSearchBtn(val) { // 处理搜索
         const { modalOrder } = this.state
+        if (modalOrder == 'lotusmpoolfind') {
+            Toast.fail('请点击搜索框下方的搜索按钮进行搜索')
+            return false
+        }
         if (val == '') {
             Toast.fail('搜索框不能为空 !')
             return false
         }
         let options = {
             name: modalOrder,
-            info: val
+            info: val,
+            num: '',
+            type: ''
         }
         if (modalOrder == 'lotuschaingetblock') {
             this.props.history.push({ pathname: "/home/homeSearch", state: { cid: val } });
@@ -179,7 +183,8 @@ class HomeList extends Component {
             let options = {
                 name: modalOrder,
                 info: sectorAddress,
-                num: sectorNumber
+                num: sectorNumber,
+                type: ''
             }
             this.props.handleSearch(options)
         }
@@ -193,6 +198,26 @@ class HomeList extends Component {
     onCloseSectorModal() {
         this.setState({ visible: false })
     }
+    handleSearchFindBtn(type) {
+        const { searchVal, modalOrder } = this.state
+        if (searchVal == '') {
+            Toast.fail('搜索框不能为空 !')
+            return false
+        }
+        let options = {
+            name: modalOrder,
+            info: searchVal,
+            num: '',
+            type: type
+        }
+        console.log('find 搜索---------', options)
+        // 调用发送方函数, 处理搜索find按钮 
+        this.props.handleSearch(options)
+    }
+    handleFindBtnChange(val) {
+        console.log('val---------', val)
+        this.setState({ searchVal: val })
+    }
 
 
     render() {
@@ -202,8 +227,7 @@ class HomeList extends Component {
             { title: 'lotus wallet' },
             { title: 'lotus client' },
             { title: 'lotus mpool' },
-            // { title: 'lotus state' },
-            // { title: 'lotus chain' }
+            { title: 'lotus state' }
         ];
         let renderContent = tabs.map((item, index) => (
             <div key={index} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '150px', backgroundColor: '#fff' }}>
@@ -213,29 +237,29 @@ class HomeList extends Component {
                     item.title == 'lotus client' && <Button style={{ minWidth: '100px' }} type="primary" size="small" onClick={() => this.handleServerBtn('list-deals')}>list-deals</Button>
                     ||
                     item.title == 'lotus mpool' && (
-                        <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between' }}>
-                            <Button style={{ minWidth: '100px', marginRight: '5px', marginBottom: '5px' }} type="primary" size="small" onClick={() => this.handleServerBtn('pending')}>pending</Button>
-                            <Button style={{ minWidth: '100px', marginRight: '5px', marginBottom: '5px' }} type="primary" size="small" onClick={() => this.handleServerBtn('find')}>find</Button>
-                            <Button style={{ minWidth: '100px', marginRight: '5px', marginBottom: '5px' }} type="primary" size="small" onClick={() => this.handleServerBtn('config')}>config</Button>
-                            <Button style={{ minWidth: '100px', marginRight: '5px', marginBottom: '5px' }} type="primary" size="small" onClick={() => this.handleServerBtn('gas-perf')}>gas-perf</Button>
+                        <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', padding: '5px' }}>
+                            <Button style={{ minWidth: '100px', marginBottom: '5px' }} type="primary" size="small" onClick={() => this.handleServerBtn('pending')}>pending</Button>
+                            <Button style={{ minWidth: '100px', marginBottom: '5px' }} type="primary" size="small" onClick={() => this.handleServerBtn('find')}>find</Button>
+                            <Button style={{ minWidth: '100px', marginBottom: '5px' }} type="primary" size="small" onClick={() => this.handleServerBtn('config')}>config</Button>
+                            <Button style={{ minWidth: '100px', marginBottom: '5px' }} type="primary" size="small" onClick={() => this.handleServerBtn('gas-perf')}>gas-perf</Button>
                         </div>
                     )
                     ||
                     item.title == 'lotus state' && (
-                        <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between' }}>
-                            <Button style={{ minWidth: '100px', marginRight: '5px', marginBottom: '5px' }} type="primary" size="small" onClick={() => this.handleServerBtn('power')}>power</Button>
-                            <Button style={{ minWidth: '100px', marginRight: '5px', marginBottom: '5px' }} type="primary" size="small" onClick={() => this.handleServerBtn('active-sectors')}>active-sectors</Button>
-                            <Button style={{ minWidth: '100px', marginRight: '5px', marginBottom: '5px' }} type="primary" size="small" onClick={() => this.handleServerBtn('list-actors')}>list-actors</Button>
-                            <Button style={{ minWidth: '100px', marginRight: '5px', marginBottom: '5px' }} type="primary" size="small" onClick={() => this.handleServerBtn('list-miners')}>list-miners</Button>
+                        <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', padding: '5px' }}>
+                            <Button style={{ minWidth: '100px', marginBottom: '5px' }} type="primary" size="small" onClick={() => this.handleServerBtn('power')}>power</Button>
+                            <Button style={{ minWidth: '100px', marginBottom: '5px' }} type="primary" size="small" onClick={() => this.handleServerBtn('active-sectors')}>active-sectors</Button>
+                            <Button style={{ minWidth: '100px', marginBottom: '5px' }} type="primary" size="small" onClick={() => this.handleServerBtn('list-actors')}>list-actors</Button>
+                            <Button style={{ minWidth: '100px', marginBottom: '5px' }} type="primary" size="small" onClick={() => this.handleServerBtn('list-miners')}>list-miners</Button>
                             {
-                                this.state.isShowSectorBtn && <Button style={{ minWidth: '100px', marginRight: '5px', marginBottom: '5px' }} type="primary" size="small" onClick={() => this.handleServerBtn('sector')}>sector</Button>
+                                this.state.isShowSectorBtn && <Button style={{ minWidth: '100px', marginBottom: '5px' }} type="primary" size="small" onClick={() => this.handleServerBtn('sector')}>sector</Button>
                             }
-                            <Button style={{ minWidth: '100px', marginRight: '5px', marginBottom: '5px' }} type="primary" size="small" onClick={() => this.handleServerBtn('read-state')}>read-state</Button>
+                            <Button style={{ minWidth: '100px', marginBottom: '5px' }} type="primary" size="small" onClick={() => this.handleServerBtn('read-state')}>read-state</Button>
                         </div>
                     )
                     ||
                     item.title == 'lotus chain' && (
-                        <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+                        <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', padding: '5px' }}>
                             {/* <Button style={{ minWidth: '100px', marginRight: '5px', marginBottom: '5px' }} type="primary" size="small" onClick={() => this.handleServerBtn('getblock')}>getblock</Button> */}
                             <Button style={{ minWidth: '100px', marginRight: '5px', marginBottom: '5px' }} type="primary" size="small" onClick={() => this.handleServerBtn('getmessage')}>getmessage</Button>
                             <Button style={{ minWidth: '100px', marginRight: '5px', marginBottom: '5px' }} type="primary" size="small" onClick={() => this.handleServerBtn('gas-price')}>gas-price</Button>
@@ -258,7 +282,9 @@ class HomeList extends Component {
                         </Accordion.Panel>
                     </Accordion>
                 ))
-            } else if (name == 'lotusclientqueryask') {
+            }
+            /*
+            else if (name == 'lotusclientqueryask') {
                 listHtml = lotusOrderList.toJS().map((item, index) => (
                     <Accordion defaultActiveKey="0" className="my-accordion">
                         <Accordion.Panel header={`Ask: ${item.ask}`}>
@@ -271,7 +297,9 @@ class HomeList extends Component {
                         </Accordion.Panel>
                     </Accordion>
                 ))
-            } else if (name == 'lotusmpoolconfig') {
+            }
+             */
+            else if (name == 'lotusmpoolconfig') {
                 listHtml = lotusOrderList.toJS().map((item, index) => (
                     <Accordion defaultActiveKey="0" className="my-accordion">
                         <Accordion.Panel header={`GasLimitOverestimation: ${item.gas_limit_overestimation}`}>
@@ -301,20 +329,20 @@ class HomeList extends Component {
             } else if (name == 'lotusstatepower') {
                 listHtml = lotusOrderList.toJS().map((item, index) => (
                     <Accordion defaultActiveKey="0" className="my-accordion">
-                        <Accordion.Panel header={`Power: ${item.Power}`}>
+                        <Accordion.Panel header={`totalPowerQuality: ${item.total_power_quality}`}>
                             <List className="my-list">
-                                <List.Item><span>Power : </span><span>{item.Power}</span></List.Item>
+                                <List.Item><span>totalPowerQuality : </span><span>{item.total_power_quality}</span></List.Item>
                             </List>
                         </Accordion.Panel>
                     </Accordion>
                 ))
-            } else if (name == 'lotusstateactivesectors') {
+            } else if (name == 'lotusstateactivesectors' && type) {
                 listHtml = lotusOrderList.toJS().map((item, index) => (
                     <Accordion defaultActiveKey="0" className="my-accordion">
                         <Accordion.Panel>
                             <List className="my-list">
+                                <List.Item><span>SealedCid : </span><span>{item.sealed_cid}</span></List.Item>
                                 <List.Item><span>SectorNumber : </span><span>{item.sector_number}</span></List.Item>
-                                <List.Item><span>SealedCID : </span><span>{item.sealed_cid}</span></List.Item>
                             </List>
                         </Accordion.Panel>
                     </Accordion>
@@ -340,14 +368,37 @@ class HomeList extends Component {
                         </Accordion.Panel>
                     </Accordion>
                 ))
-            } else if (name == 'lotusmpoolfind') {
+            } else if (name == 'lotusmpoolfind' && !type) {
                 listHtml = lotusOrderList.toJS().map((item, index) => (
                     <Accordion defaultActiveKey="0" className="my-accordion">
                         <Accordion.Panel header={`From: ${item.From}`}>
                             <List className="my-list">
                                 <List.Item><span>From : </span><span>{item.From}</span></List.Item>
-                                <List.Item><span>To : </span><span>{item.To}</span></List.Item>
                                 <List.Item><span>Method : </span><span>{item.Method}</span></List.Item>
+                                <List.Item><span>To : </span><span>{item.To}</span></List.Item>
+                            </List>
+                        </Accordion.Panel>
+                    </Accordion>
+                ))
+            } else if (name == 'lotusmpoolfind' && type) {
+                listHtml = lotusOrderList.toJS().map((item, index) => (
+                    <Accordion defaultActiveKey="0" className="my-accordion">
+                        <Accordion.Panel header={`Id: ${item.id}`}>
+                            <List className="my-list">
+                                <List.Item><span>Id : </span><span>{item.id}</span></List.Item>
+                                <List.Item><span>CId : </span><span>{item.CId}</span></List.Item>
+                                <List.Item><span>Version : </span><span>{item.version}</span></List.Item>
+                                <List.Item><span>ToAddress : </span><span>{item.to_address}</span></List.Item>
+                                <List.Item><span>FromAddress : </span><span>{item.from_address}</span></List.Item>
+                                <List.Item><span>Nonce : </span><span>{item.nonce}</span></List.Item>
+                                <List.Item><span>Value : </span><span>{item.value}</span></List.Item>
+                                <List.Item><span>GasLimit : </span><span>{item.gas_limit}</span></List.Item>
+                                <List.Item><span>GasFeeCap : </span><span>{item.gas_fee_cap}</span></List.Item>
+                                <List.Item><span>GasPremium : </span><span>{item.gas_premium}</span></List.Item>
+                                <List.Item><span>Method : </span><span>{item.method}</span></List.Item>
+                                <List.Item><span>Params : </span><span>{item.Params}</span></List.Item>
+                                <List.Item><span>Type : </span><span>{item.Type}</span></List.Item>
+                                <List.Item><span>Data : </span><span>{item.Data}</span></List.Item>
                             </List>
                         </Accordion.Panel>
                     </Accordion>
@@ -504,6 +555,29 @@ class HomeList extends Component {
                         </Accordion.Panel>
                     </Accordion>
                 ))
+            } else if (name == 'lotuschaingetmessage' && type) {
+                listHtml = lotusOrderList.toJS().map((item, index) => (
+                    <Accordion defaultActiveKey="0" className="my-accordion">
+                        <Accordion.Panel header={`getMessage`}>
+                            <List className="my-list">
+                                <List.Item><span>Cid : </span><span>{item.cid}</span></List.Item>
+                                <List.Item><span>Data : </span><span>{item.data}</span></List.Item>
+                                <List.Item><span>FromAddress : </span><span>{item.from_address}</span></List.Item>
+                                <List.Item><span>GasFeeCap : </span><span>{item.gas_fee_cap}</span></List.Item>
+                                <List.Item><span>GasLimit : </span><span>{item.gas_limit}</span></List.Item>
+                                <List.Item><span>GasPremium : </span><span>{item.gas_premium}</span></List.Item>
+                                <List.Item><span>Id : </span><span>{item.id}</span></List.Item>
+                                <List.Item><span>Method : </span><span>{item.method}</span></List.Item>
+                                <List.Item><span>Nonce : </span><span>{item.Nonce}</span></List.Item>
+                                <List.Item><span>Params : </span><span>{item.Params}</span></List.Item>
+                                <List.Item><span>ToAddress : </span><span>{item.ToAddress}</span></List.Item>
+                                <List.Item><span>Type : </span><span>{item.Type}</span></List.Item>
+                                <List.Item><span>Value : </span><span>{item.Value}</span></List.Item>
+                                <List.Item><span>Version : </span><span>{item.Version}</span></List.Item>
+                            </List>
+                        </Accordion.Panel>
+                    </Accordion>
+                ))
             } else if (name == 'lotuschaingasprice' && type) {
                 listHtml = lotusOrderList.toJS().map((item, index) => (
                     <Accordion defaultActiveKey="0" className="my-accordion">
@@ -515,7 +589,7 @@ class HomeList extends Component {
                         </Accordion.Panel>
                     </Accordion>
                 ))
-            }   //在此次接着写新接口的判断
+            }   // 在此次接着写新接口的判断
 
         }
 
@@ -602,10 +676,22 @@ class HomeList extends Component {
                         {
                             this.state.isShowSearch && (
                                 <div className="search_wrap">
-                                    <SearchBar
-                                        placeholder="Search"
-                                        onSubmit={this.handleSearchBtn}
-                                    />
+                                    <div>
+                                        <SearchBar
+                                            placeholder="Search"
+                                            onChange={this.handleFindBtnChange}
+                                            onSubmit={this.handleSearchBtn}
+                                        />
+                                    </div>
+                                    {
+                                        this.state.isShowFindBtn && (
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '5px' }}>
+                                                <Button style={{ minWidth: '80px' }} type="primary" size="small" onClick={() => this.handleSearchFindBtn("From")}>搜索 From</Button>
+                                                <Button style={{ minWidth: '80px' }} type="primary" size="small" onClick={() => this.handleSearchFindBtn("Method")}>搜索 Method</Button>
+                                                <Button style={{ minWidth: '80px' }} type="primary" size="small" onClick={() => this.handleSearchFindBtn("To")}>搜索 To</Button>
+                                            </div>
+                                        )
+                                    }
                                 </div>
                             )
                         }
@@ -619,7 +705,7 @@ class HomeList extends Component {
                                 {listHtml != null && listHtml}
                             </List>
                         </div>
-                        <div style={{ width: '100%' }}>
+                        <div style={{ width: '100%', background: '#fff' }}>
                             <Chart height={300} data={data} scale={cols} forceFit padding={[20, 30, 40, 30]}>
                                 <Axis
                                     name="month"
@@ -654,7 +740,7 @@ class HomeList extends Component {
                         </div>
                     </div>
                     {/* ----------------------------------------------- */}
-                    {/* <Modal
+                    <Modal
                         transparent={true}
                         visible={this.state.visible}
                         onClose={this.onCloseSectorModal}
@@ -672,7 +758,7 @@ class HomeList extends Component {
                                 <Button type="primary" size="small" onClick={this.handleSubmitSearch}>搜索</Button>
                             </List.Item>
                         </List>
-                    </Modal> */}
+                    </Modal>
                 </div>
             </div>
         )
