@@ -227,14 +227,18 @@ class HomeList extends Component {
             { title: 'lotus wallet' },
             { title: 'lotus client' },
             { title: 'lotus mpool' },
-            { title: 'lotus state' }
+            { title: 'lotus state' },
+            { title: 'lotus chain' }
         ];
         let renderContent = tabs.map((item, index) => (
             <div key={index} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '150px', backgroundColor: '#fff' }}>
                 {
                     item.title == 'lotus wallet' && <Button style={{ minWidth: '100px' }} type="primary" size="small" onClick={() => this.handleServerBtn('list')}>list</Button>
                     ||
-                    item.title == 'lotus client' && <Button style={{ minWidth: '100px' }} type="primary" size="small" onClick={() => this.handleServerBtn('list-deals')}>list-deals</Button>
+                    item.title == 'lotus client' &&
+                    <div>
+                        {/* <Button style={{ minWidth: '100px' }} type="primary" size="small" onClick={() => this.handleServerBtn('list-deals')}>list-deals</Button> */}
+                    </div>
                     ||
                     item.title == 'lotus mpool' && (
                         <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', padding: '5px' }}>
@@ -435,21 +439,7 @@ class HomeList extends Component {
                         </Accordion.Panel>
                     </Accordion>
                 ))
-            }
-            /*
-            else if (name == 'lotusstatelistactors' && !type) {
-                listHtml = lotusOrderList.toJS().map((item, index) => (
-                    <Accordion className="my-accordion">
-                        <Accordion.Panel header={`Address: ${item.address}`}>
-                            <List className="my-list">
-                                <List.Item><span>Address : </span><span>{item.address}</span></List.Item>
-                            </List>
-                        </Accordion.Panel>
-                    </Accordion>
-                ))
-            }
-            */
-            else if (name == 'lotusstatelistactors' && type) {
+            } else if (name == 'lotusstatelistactors' && type) {
                 listHtml = lotusOrderList.toJS().map((item, index) => (
                     <Accordion defaultActiveKey="0" className="my-accordion">
                         <Accordion.Panel header={`Address: ${item.Address}`}>
@@ -463,21 +453,7 @@ class HomeList extends Component {
                         </Accordion.Panel>
                     </Accordion>
                 ))
-            }
-            /*
-            else if (name == 'lotusstatereadstate' && !type) {
-                listHtml = lotusOrderList.toJS().map((item, index) => (
-                    <Accordion className="my-accordion">
-                        <Accordion.Panel header={`Address: ${item.address}`}>
-                            <List className="my-list">
-                                <List.Item><span>Address : </span><span>{item.address}</span></List.Item>
-                            </List>
-                        </Accordion.Panel>
-                    </Accordion>
-                ))
-            }
-            */
-            else if (name == 'lotusstatereadstate' && type) {
+            } else if (name == 'lotusstatereadstate' && type) {
                 listHtml = lotusOrderList.toJS().map((item, index) => (
                     <Accordion defaultActiveKey="0" className="my-accordion">
                         <Accordion.Panel>
@@ -500,21 +476,7 @@ class HomeList extends Component {
                         </Accordion.Panel>
                     </Accordion>
                 ))
-            }
-            /*
-            else if (name == 'lotusstatelistminers' && !type) {
-                listHtml = lotusOrderList.toJS().map((item, index) => (
-                    <Accordion className="my-accordion">
-                        <Accordion.Panel header={`Address: ${item.address}`}>
-                            <List className="my-list">
-                                <List.Item><span>Address : </span><span>{item.address}</span></List.Item>
-                            </List>
-                        </Accordion.Panel>
-                    </Accordion>
-                ))
-            }
-            */
-            else if (name == 'lotusstatelistminers' && type) {
+            } else if (name == 'lotusstatelistminers' && type) {
                 listHtml = lotusOrderList.toJS().map((item, index) => (
                     <Accordion defaultActiveKey="0" className="my-accordion">
                         <Accordion.Panel header={`ActualPower: ${item.ActualPower}`}>
