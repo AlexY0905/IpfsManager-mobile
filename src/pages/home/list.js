@@ -286,24 +286,7 @@ class HomeList extends Component {
                         </Accordion.Panel>
                     </Accordion>
                 ))
-            }
-            /*
-            else if (name == 'lotusclientqueryask') {
-                listHtml = lotusOrderList.toJS().map((item, index) => (
-                    <Accordion defaultActiveKey="0" className="my-accordion">
-                        <Accordion.Panel header={`Ask: ${item.ask}`}>
-                            <List className="my-list">
-                                <List.Item><span>Ask : </span><span>{item.ask}</span></List.Item>
-                                <List.Item><span>Price per : </span><span>{item.price}</span></List.Item>
-                                <List.Item><span>Verified : </span><span>{item.verified_price}</span></List.Item>
-                                <List.Item><span>Max piece size : </span><span>{item.max}</span></List.Item>
-                            </List>
-                        </Accordion.Panel>
-                    </Accordion>
-                ))
-            }
-             */
-            else if (name == 'lotusmpoolconfig') {
+            } else if (name == 'lotusmpoolconfig') {
                 listHtml = lotusOrderList.toJS().map((item, index) => (
                     <Accordion defaultActiveKey="0" className="my-accordion">
                         <Accordion.Panel header={`GasLimitOverestimation: ${item.gas_limit_overestimation}`}>
@@ -701,7 +684,6 @@ class HomeList extends Component {
                             </Chart>
                         </div>
                     </div>
-                    {/* ----------------------------------------------- */}
                     <Modal
                         transparent={true}
                         visible={this.state.visible}
