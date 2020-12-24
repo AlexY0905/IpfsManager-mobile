@@ -10,18 +10,18 @@ const getIsLoadingStart = () => ({
 const getIsLoadingEnd = () => ({
     type: types.ISLOADING_END
 })
-const handleLotusOrdersData = (payload) => ({
-    type: types.GET_LOTUSORDERLIST,
+const handleLotusMinerData = (payload) => ({
+    type: types.GET_LOTUSMINERLIST,
     payload: payload
 })
-export const handleLotusOrdersAction = (options) => {
+export const handleLotusMinerAction = (options) => {
     return (dispatch, getState) => {
         dispatch(getIsLoadingStart())
         api.getLotusMiner(options)
             .then((result) => {
                 console.log('::::::::-------', result)
                 // 将后台请求过来的成功数据, 派发action, 到store
-                dispatch(handleLotusOrdersData(result))
+                dispatch(handleLotusMinerData(result))
             })
             .catch((err) => {
                 Toast.fail('获取数据失败, 请稍后再试 !')
@@ -37,9 +37,9 @@ export const handleSearchAction = (options) => {
         dispatch(getIsLoadingStart())
         api.getSearchData(options)
             .then((result) => {
-                console.log('result---------', result)
+                // console.log('result---------', result)
                 // 将后台请求过来的成功数据, 派发action, 到store
-                dispatch(handleLotusOrdersData(result))
+                dispatch(handleLotusMinerData(result))
             })
             .catch((err) => {
                 Toast.fail('获取数据失败, 请稍后再试 !')

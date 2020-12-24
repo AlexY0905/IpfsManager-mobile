@@ -11,6 +11,7 @@ import { Tooltip, Chart, Geom, Axis, Legend } from 'bizcharts';
 
 const Item = List.Item;
 
+let timer = null
 class LotusHelp extends Component {
     constructor(props) {
         super(props)
@@ -37,49 +38,45 @@ class LotusHelp extends Component {
         console.log(':::::::--------', args);
         this.setState({ open: !this.state.open });
     }
-    handleServerBtn(type) {//所有六个按钮的点击事件
+
+    handleServerBtn(type) { // 所有按钮的点击事件
+        if (timer != null) {
+            clearInterval(timer)
+        }
         let options = {
             name: ''
         }
         switch (type) {
             case 'list':
-                options.name = 'storagedealslist'
+                options.name = 'lotusminerstoragedealslist' // 改成后台给的name
                 this.setState({ isShowSearch: false })
-                break
+                return false
             case 'get-ask':
                 options.name = 'lotusminerstoragedealsgetask'
                 this.setState({ isShowSearch: false })
                 break
-            case 'list-cids':
-                options.name = 'pieceslist-cids'
-                this.setState({ isShowSearch: false })
-                break
             case 'cid-info':
-                options.name = 'piecescid-info'
-                this.setState({ isShowSearch: false })
-                break
-            case 'sectorslist':
-                options.name = 'sectorssectorslist'
-                this.setState({ isShowSearch: false })
-                break
+                options.name = 'lotusminerpiecescidinfo'
+                this.setState({ modalOrder: 'lotusminerpiecescidinfo', isShowSearch: true })
+                return false
             case 'status':
-                options.name = 'sectorsstatus'
-                this.setState({ isShowSearch: false })
-                break
+                options.name = 'lotusminersectorsstatus'
+                this.setState({ modalOrder: 'lotusminersectorsstatus', isShowSearch: true })
+                return false
         }
-        //调用发送方函数, 处理lotus命令
-        this.props.handleLotusOrders(options)
-        setInterval(() => {//十一分钟刷新一次数据
-            this.props.handleLotusOrders(options)
-        }, 660000)
 
+        // 调用发送方函数, 处理lotus命令
+        this.props.handleLotusMiner(options)
+        timer = setInterval(() => { // 十一分钟刷新一次数据
+            this.props.handleLotusMiner(options)
+        }, 660000)
         this.setState({
             modalType: type
         })
     }
 
 
-    handleSearchBtn(val) {//处理搜索
+    handleSearchBtn(val) { // 处理搜索
         const { modalOrder } = this.state
         if (val == '') {
             Toast.fail('搜索框不能为空 !')
@@ -87,25 +84,27 @@ class LotusHelp extends Component {
         }
         let options = {
             name: modalOrder,
-            info: val
+            info: val,
+            num: '',
+            type: ''
         }
 
         console.log('options---------', options)
-        return false
         //调用发送方函数, 处理搜索
         this.props.handleSearch(options)
     }
 
     handleTabsOnChange(item) {
         console.log('============', item)
+        this.setState({ isShowSearch: false })
     }
 
 
 
     render() {
-        let { name, type, lotusOrderList } = this.props
+        let { name, type, lotusminerlist } = this.props
         let { modalType } = this.state
-        const tabs = [//选项卡切换
+        const tabs = [ // 选项卡切换
             { title: 'storage-deals' },
             // { title: 'pieces' },
             // { title: 'sectors' }
@@ -114,22 +113,20 @@ class LotusHelp extends Component {
             <div key={index} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '150px', backgroundColor: '#fff' }}>
                 {
                     item.title == 'storage-deals' && (
-                        <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+                        <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
                             {/* <Button style={{ width: '100px' }} type="primary" size="small" onClick={() => this.handleServerBtn('list')}>list</Button> */}
                             <Button style={{ width: '100px' }} type="primary" size="small" onClick={() => this.handleServerBtn('get-ask')}>get-ask</Button>
                         </div>
                     )
                     ||
                     item.title == 'pieces' && (
-                        <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between' }}>
-                            <Button style={{ width: '100px' }} type="primary" size="small" onClick={() => this.handleServerBtn('list-cids')}>list-cids</Button>
+                        <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
                             <Button style={{ width: '100px' }} type="primary" size="small" onClick={() => this.handleServerBtn('cid-info')}>cid-info</Button>
                         </div>
                     )
                     ||
                     item.title == 'sectors' && (
-                        <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between' }}>
-                            <Button style={{ width: '100px' }} type="primary" size="small" onClick={() => this.handleServerBtn('sectorslist')}>sectorslist</Button>
+                        <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
                             <Button style={{ width: '100px' }} type="primary" size="small" onClick={() => this.handleServerBtn('status')}>status</Button>
                         </div>
                     )
@@ -137,9 +134,9 @@ class LotusHelp extends Component {
             </div>
         ))
         let listHtml = null
-        if (lotusOrderList.toJS().length > 0) {
+        if (lotusminerlist.toJS().length > 0) {
             if (name == 'storagedealslist') {
-                listHtml = lotusOrderList.toJS().map((item, index) => (
+                listHtml = lotusminerlist.toJS().map((item, index) => (
                     <Accordion defaultActiveKey="0" className="my-accordion">
                         <Accordion.Panel header={`ProposalCid: ${item.proposalCid}`}>
                             <List className="my-list">
@@ -155,7 +152,7 @@ class LotusHelp extends Component {
                     </Accordion>
                 ))
             } else if (name == 'lotusminerstoragedealsgetask') {
-                listHtml = lotusOrderList.toJS().map((item, index) => (
+                listHtml = lotusminerlist.toJS().map((item, index) => (
                     <Accordion defaultActiveKey="0" className="my-accordion">
                         <Accordion.Panel header={`Expiry: ${item.expiry}`}>
                             <List className="my-list">
@@ -171,139 +168,45 @@ class LotusHelp extends Component {
                         </Accordion.Panel>
                     </Accordion>
                 ))
-            } else if (name == 'pieceslist-cids') {
-                listHtml = lotusOrderList.toJS().map((item, index) => (
+            } else if (name == 'lotusminerpiecescidinfo' && type) {
+                listHtml = lotusminerlist.toJS().map((item, index) => (
                     <Accordion defaultActiveKey="0" className="my-accordion">
-                        <Accordion.Panel header={`Cid: ${item.cid}`}>
+                        <Accordion.Panel header={`cid-info`}>
                             <List className="my-list">
+                                <List.Item><span>Id : </span><span>{item.id}</span></List.Item>
                                 <List.Item><span>Cid : </span><span>{item.cid}</span></List.Item>
+                                <List.Item><span>BlockSize : </span><span>{item.block_size}</span></List.Item>
+                                <List.Item><span>PiecesCid : </span><span>{item.pieces_cid}</span></List.Item>
+                                <List.Item><span>RelOffset : </span><span>{item.rel_offset}</span></List.Item>
                             </List>
                         </Accordion.Panel>
                     </Accordion>
                 ))
-            } else if (name == 'piecescid-info') {
-                listHtml = lotusOrderList.toJS().map((item, index) => (
+            } else if (name == 'lotusminersectorsstatus' && type) {
+                listHtml = lotusminerlist.toJS().map((item, index) => (
                     <Accordion defaultActiveKey="0" className="my-accordion">
-                        <Accordion.Panel header={`PieceCid: ${item.pieceCid}`}>
+                        <Accordion.Panel header={`status`}>
                             <List className="my-list">
-                                <List.Item><span>PieceCid : </span><span>{item.pieceCid}</span></List.Item>
-                                <List.Item><span>offset : </span><span>{item.offset}</span></List.Item>
-                                <List.Item><span>Size : </span><span>{item.size}</span></List.Item>
-                            </List>
-                        </Accordion.Panel>
-                    </Accordion>
-                ))
-            } else if (name == 'sectorssectorslist') {
-                listHtml = lotusOrderList.toJS().map((item, index) => (
-                    <Accordion defaultActiveKey="0" className="my-accordion">
-                        <Accordion.Panel header={`PieceCid: ${item.pieceCid}`}>
-                            <List className="my-list">
-                                <List.Item><span>PieceCid : </span><span>{item.pieceCid}</span></List.Item>
-                            </List>
-                        </Accordion.Panel>
-                    </Accordion>
-                ))
-            } else if (name == 'sectorsstatus') {
-                listHtml = lotusOrderList.toJS().map((item, index) => (
-                    <Accordion defaultActiveKey="0" className="my-accordion">
-                        <Accordion.Panel header={`ISGarbageSector: ${item.isgarbagesector}`}>
-                            <List className="my-list">
-                                <List.Item><span>ISGarbageSector : </span><span>{item.isgarbagesector}</span></List.Item>
-                                <List.Item><span>Status : </span><span>{item.status}</span></List.Item>
-                                <List.Item><span>CIDcommD : </span><span>{item.cidcommd}</span></List.Item>
-                                <List.Item><span>CIDcommR : </span><span>{item.cidcommr}</span></List.Item>
-                                <List.Item><span>Ticket : </span><span>{item.ticket}</span></List.Item>
-                                <List.Item><span>TicketH : </span><span>{item.ticketh}</span></List.Item>
-                                <List.Item><span>Seed : </span><span>{item.seed}</span></List.Item>
-                                <List.Item><span>SeedH : </span><span>{item.seedh}</span></List.Item>
-                                <List.Item><span>Precommit : </span><span>{item.precommit}</span></List.Item>
-                                <List.Item><span>Commit : </span><span>{item.commit}</span></List.Item>
-                                <List.Item><span>Proof : </span><span>{item.proof}</span></List.Item>
-                                <List.Item><span>Deals : </span><span>{item.deals}</span></List.Item>
-                                <List.Item><span>Retries : </span><span>{item.retries}</span></List.Item>
+                                <List.Item><span>SectorID : </span><span>{item.SectorID}</span></List.Item>
+                                <List.Item><span>ISGarbageSector : </span><span>{item.ISGarbageSector}</span></List.Item>
+                                <List.Item><span>Status : </span><span>{item.Status}</span></List.Item>
+                                <List.Item><span>CIDcommD : </span><span>{item.CIDcommD}</span></List.Item>
+                                <List.Item><span>CIDcommR : </span><span>{item.CIDcommR}</span></List.Item>
+                                <List.Item><span>Ticket : </span><span>{item.Ticket}</span></List.Item>
+                                <List.Item><span>TicketH : </span><span>{item.TicketH}</span></List.Item>
+                                <List.Item><span>Seed : </span><span>{item.Seed}</span></List.Item>
+                                <List.Item><span>SeedH : </span><span>{item.SeedH}</span></List.Item>
+                                <List.Item><span>Precommit : </span><span>{item.Precommit}</span></List.Item>
+                                <List.Item><span>Commit : </span><span>{item.Commit}</span></List.Item>
+                                <List.Item><span>Proof : </span><span>{item.Proof}</span></List.Item>
+                                <List.Item><span>Deals : </span><span>{item.Deals}</span></List.Item>
+                                <List.Item><span>Retries : </span><span>{item.Retries}</span></List.Item>
                             </List>
                         </Accordion.Panel>
                     </Accordion>
                 ))
             }
         }
-
-        const data = [
-            {
-                month: "2015-01-01",
-                acc: 84.0,
-                type: '有效算力'
-            },
-            {
-                month: "2015-02-01",
-                acc: 14.9,
-                type: '有效算力'
-            },
-            {
-                month: "2015-03-01",
-                acc: 17.0,
-                type: '有效算力'
-            },
-            {
-                month: "2015-04-01",
-                acc: 20.2,
-                type: '有效算力'
-            },
-            {
-                month: "2015-05-01",
-                acc: 55.6,
-                type: '有效算力'
-            },
-            {
-                month: "2015-06-01",
-                acc: 56.7,
-                type: '有效算力'
-            },
-            {
-                month: "2015-07-01",
-                acc: 30.6,
-                type: '有效算力'
-            },
-            {
-                month: "2015-08-01",
-                acc: 63.2,
-                type: '有效算力'
-            },
-            {
-                month: "2015-09-01",
-                acc: -24.6,
-                type: '有效算力'
-            },
-            {
-                month: "2015-10-01",
-                acc: 14.0,
-                type: '有效算力'
-            },
-            {
-                month: "2015-11-01",
-                acc: 9.4,
-                type: '有效算力'
-            },
-            {
-                month: "2015-12-01",
-                acc: 6.3,
-                type: '有效算力'
-            }
-        ];
-        const cols = {
-            month: {
-                nice: true,
-                alias: "月份"
-            },
-            acc: {
-                nice: true,
-                alias: "积累量"
-            }
-        };
-        const colors = ["#6394f9", "#62daaa"];
-
-
-
 
         return (
             <div>
@@ -330,43 +233,7 @@ class LotusHelp extends Component {
                                 {listHtml != null && listHtml}
                             </List>
                         </div>
-                        {/* <div style={{ width: '100%' }}>
-                            <Chart height={300} data={data} scale={cols} forceFit padding={[20, 30, 40, 30]}>
-                                <Axis
-                                    name="month"
-                                    title={null}
-                                    tickLine={null}
-                                    line={{
-                                        stroke: "#E6E6E6"
-                                    }}
-                                />
-                                <Axis
-                                    name="acc"
-                                    line={false}
-                                    tickLine={null}
-                                    grid={null}
-                                    title={null}
-                                />
-                                <Tooltip />
-                                <Legend name="type" />
-                                <Geom
-                                    type="line"
-                                    position="month*acc"
-                                    size={1}
-                                    color="l (270) 0:rgba(255, 146, 255, 1) .5:rgba(100, 268, 255, 1) 1:rgba(215, 0, 255, 1)"
-                                    shape="smooth"
-                                    style={{
-                                        shadowColor: "l (270) 0:rgba(21, 146, 255, 0)",
-                                        shadowBlur: 60,
-                                        shadowOffsetY: 6
-                                    }}
-                                />
-                            </Chart>
-                        </div> */}
                     </div>
-                    {/* <div className="content" style={{ marginTop: '100px' }}>
-                        欢迎来到lotusMiner页面
-                    </div> */}
                 </div>
             </div>
         )
@@ -378,13 +245,13 @@ const mapStateToProps = (state) => ({
     isLoading: state.get('lotusMiner').get('isLoading'),
     name: state.get('lotusMiner').get('name'),
     type: state.get('lotusMiner').get('type'),
-    lotusOrderList: state.get('lotusMiner').get('lotusOrderList')
+    lotusminerlist: state.get('lotusMiner').get('lotusminerlist')
 })
 // 发送方
 const mapDispatchToProps = (dispatch) => ({
-    // （handleLotusOrders）自定义这个函数名 用这个函数名派发action
-    handleLotusOrders: (options) => {
-        dispatch(actionCreator.handleLotusOrdersAction(options))
+    // （handleLotusMiner）自定义这个函数名 用这个函数名派发action
+    handleLotusMiner: (options) => {
+        dispatch(actionCreator.handleLotusMinerAction(options))
     },
     handleSearch: (options) => {
         dispatch(actionCreator.handleSearchAction(options))

@@ -2,25 +2,28 @@
 import React, { Component } from 'react'
 import { NavLink } from "react-router-dom"
 import { connect } from 'react-redux'
-import { Button, Modal, NavBar, Icon, Steps } from 'antd-mobile';
+import {Button, Tabs, Steps, List, Checkbox} from 'antd-mobile';
 import "./index.css"
 import HomeSider from 'common/sider/index'
 import { actionCreator } from './store'
 
 const Step = Steps.Step;
+const CheckboxItem = Checkbox.CheckboxItem;
 
 class LotusHelp extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            open: false
+            open: false,
+            selectedDataList: []
         }
         this.onOpenChange = this.onOpenChange.bind(this)
         this.handleDeploy = this.handleDeploy.bind(this)
+        this.serverOnChange = this.serverOnChange.bind(this)
     }
     componentDidMount() {
-        // 在生命周期调用发送方的数据
-        // this.props.handleGetMinerList()
+        // 调用发送方的数据 显示服务器列表
+        this.props.handleGetServerHostData()
     }
     onOpenChange(args) {
         console.log(':::::::--------', args);
@@ -37,6 +40,31 @@ class LotusHelp extends Component {
             console.log(1111111, type)
         } else if (type == '启动worker') {
             console.log(1111111, type)
+        }
+    }
+    serverOnChange(e, item) {
+        console.log(':::::::::::---------', e);
+        console.log(':::::::::::---------', item);
+        let { selectedDataList } = this.state
+        let arr = selectedDataList
+        if (e.target.checked) {
+            this.setState({
+                selectedDataList: [...selectedDataList, item]
+            }, () => {
+                console.log(22222222222, this.state.selectedDataList);
+                arr = this.state.selectedDataList
+            })
+        } else {
+            arr.forEach((v, i) => {
+                if (v.id == item.id) {
+                    arr.splice(i, 1)
+                    this.setState({
+                        selectedDataList: arr
+                    }, () => {
+                        console.log(11111111111, this.state.selectedDataList);
+                    })
+                }
+            })
         }
     }
 
@@ -107,12 +135,15 @@ class LotusHelp extends Component {
                 </path>
             </svg>
         )
-
-        return (
-            <div>
-                <div style={{ overflow: 'hidden', padding: '0', margin: '0' }}>
-                    <HomeSider open={this.state.open} activeTxt="lotus部署" />
-                    <div className="content" style={{ paddingTop: '50px' }}>
+        let { serverhostlist } = this.props
+        const tabs = [ // 选项卡切换
+            { title: '部署' },
+            // { title: '测试' }
+        ];
+        let renderContent = tabs.map((item, index) => (
+            <div style={{margin: '0 auto'}}>
+                {
+                    item.title == '部署' && (
                         <div className="step_wrap" style={{ padding: '5px' }}>
                             <Steps current={0}>
                                 <Step description={<Button type="primary" size="small" onClick={() => this.handleDeploy('编译')}>编译</Button>} icon={one()} />
@@ -122,10 +153,43 @@ class LotusHelp extends Component {
                                 <Step description={<Button type="primary" size="small" onClick={() => this.handleDeploy('启动worker')}>启动 worker</Button>} icon={five()} />
                             </Steps>
                         </div>
+                    )
+                    ||
+                    item.title == '测试' && (
+                        <div style={{padding: '30px 0', display: 'flex', justifyContent: 'center'}}><Button style={{marginTop: '20px auto', width: '150px'}} type="primary" size="small" onClick={() => this.handleDeploy('bench 测试')}>bench 测试</Button></div>
+                    )
+                }
+            </div>
+        ))
+
+        return (
+            <div>
+                <div style={{ overflow: 'hidden', padding: '0', margin: '0' }}>
+                    <HomeSider open={this.state.open} activeTxt="lotus部署" />
+                    <div className="content" style={{ paddingTop: '46px' }}>
+                        <div>
+                            <Tabs tabs={tabs} swipeable={false} renderTabBar={props => <Tabs.DefaultTabBar {...props} page={3} onTabClick={this.handleTabsOnChange} />}>
+                                { renderContent && renderContent }
+                            </Tabs>
+                        </div>
+                        {
+                            /*
+                            <div className="ip_wrap">
+                                <div>
+                                    <List renderHeader={() => '服务器IP地址'}>
+                                        {
+                                            serverhostlist.toJS().length > 0 && serverhostlist.toJS().map(item => (
+                                                <CheckboxItem key={item.id} onChange={(e) => this.serverOnChange(e, item)}>
+                                                    {item.host}
+                                                </CheckboxItem>
+                                            ))
+                                        }
+                                    </List>
+                                </div>
+                            </div>
+                             */
+                        }
                     </div>
-                    {/* <div className="content" style={{ marginTop: '100px' }}>
-                        欢迎来到lotus部署页面
-                    </div> */}
                 </div>
             </div>
         )
@@ -134,16 +198,14 @@ class LotusHelp extends Component {
 // 接收方
 const mapStateToProps = (state) => ({
     // 获取属于home页面 store中的所有数据
-    // minerList: state.get('home').get('minerList')
+    serverhostlist: state.get('lotusHelp').get('serverhostlist')
 })
 // 发送方
 const mapDispatchToProps = (dispatch) => ({
     // （handleGetMinerList）自定义这个函数名 用这个函数名派发action
-    /*
-    handleGetMinerList: () => {
-        dispatch(actionCreator.handleMinerlistAction())
+    handleGetServerHostData: () => { // 处理获取服务器数据列表
+        dispatch(actionCreator.handleGetServerHostDataAction())
     }
-     */
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(LotusHelp)

@@ -86,6 +86,11 @@ export const API_CONFIG = {
         '/v5/lotus',
         'get'
     ],
+    // lotus命令页面, 折线图接口
+    getMinerPower: [
+        '/v6/minerpower',
+        'get'
+    ],
     // lotusMiner页面 按钮接口
     getLotusMiner: [
         '/v5/lotus',

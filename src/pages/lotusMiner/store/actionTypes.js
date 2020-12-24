@@ -1,5 +1,5 @@
 // 导出lotusMiner页 数据的类型
-export const GET_LOTUSORDERLIST = 'lotusMiner@get_lotusOrderList'
+export const GET_LOTUSMINERLIST = 'lotusMiner@get_lotusminerlist'
 
 
 export const ISLOADING_START = 'lotusMiner@isloading_start'

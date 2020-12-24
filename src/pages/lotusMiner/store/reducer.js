@@ -5,7 +5,7 @@ const defaultState = fromJS({
     // 默认值里定义的属性名就是请求后台返回过来的数据里面的属性名
     name: '',
     type: false,
-    lotusOrderList: [],
+    lotusminerlist: [],
     isLoading: false
 })
 // 以下action是从actionCreator.js里面 handleLtclistData()来到  payload参数想当于result
@@ -16,10 +16,10 @@ export default (state = defaultState, action) => {
             isLoading: true
         })
     }
-    if (action.type == types.GET_LOTUSORDERLIST) {
+    if (action.type == types.GET_LOTUSMINERLIST) {
         return state.merge({
             // action参数, 就是actionCreator.js中, 请求数据成功之后的.then函数中派发的action
-            lotusOrderList: fromJS(action.payload.msg), // 将数据数组转换成immutable
+            lotusminerlist: fromJS(action.payload.msg), // 将数据数组转换成immutable
             name: action.payload.name,
             type: action.payload.type
         })

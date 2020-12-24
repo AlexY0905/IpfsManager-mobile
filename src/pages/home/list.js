@@ -42,7 +42,7 @@ class HomeList extends Component {
     }
     componentDidMount() {
         // 在生命周期调用发送方的数据
-
+        this.props.handleEchartsData()
     }
     onOpenChange(args) {
         console.log(':::::::--------', args);
@@ -221,8 +221,9 @@ class HomeList extends Component {
 
 
     render() {
-        let { name, type, lotusOrderList } = this.props
+        let { name, type, lotusOrderList, echartsDataList } = this.props
         let { modalType } = this.state
+        let echartsData = []
         const tabs = [
             { title: 'lotus wallet' },
             { title: 'lotus client' },
@@ -237,7 +238,7 @@ class HomeList extends Component {
                     ||
                     item.title == 'lotus client' &&
                     <div>
-                        {/* <Button style={{ minWidth: '100px' }} type="primary" size="small" onClick={() => this.handleServerBtn('list-deals')}>list-deals</Button> */}
+                        <Button style={{ minWidth: '100px' }} type="primary" size="small" onClick={() => this.handleServerBtn('list-deals')}>list-deals</Button>
                     </div>
                     ||
                     item.title == 'lotus mpool' && (
@@ -390,24 +391,24 @@ class HomeList extends Component {
                         </Accordion.Panel>
                     </Accordion>
                 ))
-            } else if (name == 'lotusclientlist-deals') {
+            } else if (name == 'lotusclientlistdeals') {
                 listHtml = lotusOrderList.toJS().map((item, index) => (
                     <Accordion defaultActiveKey="0" className="my-accordion">
-                        <Accordion.Panel header={`Created: ${item.Created}`}>
+                        <Accordion.Panel header={`creation_time: ${item.creation_time}`}>
                             <List className="my-list">
-                                <List.Item><span>Created : </span><span>{item.Created}</span></List.Item>
-                                <List.Item><span>DealCid : </span><span>{item.DealCid}</span></List.Item>
-                                <List.Item><span>DealId : </span><span>{item.DealId}</span></List.Item>
-                                <List.Item><span>Provider : </span><span>{item.Provider}</span></List.Item>
-                                <List.Item><span>State : </span><span>{item.State}</span></List.Item>
-                                <List.Item><span>OnChain : </span><span>{item.OnChain}</span></List.Item>
-                                <List.Item><span>Slashed : </span><span>{item.Slashed}</span></List.Item>
-                                <List.Item><span>PieceCID : </span><span>{item.PieceCID}</span></List.Item>
-                                <List.Item><span>Size : </span><span>{item.Size}</span></List.Item>
-                                <List.Item><span>Price : </span><span>{item.Price}</span></List.Item>
-                                <List.Item><span>Duration : </span><span>{item.Duration}</span></List.Item>
-                                <List.Item><span>Verified : </span><span>{item.Verified}</span></List.Item>
-                                <List.Item><span>Message : </span><span>{item.Message}</span></List.Item>
+                                <List.Item><span>creation_time : </span><span>{item.creation_time}</span></List.Item>
+                                <List.Item><span>deal_id : </span><span>{item.deal_id}</span></List.Item>
+                                <List.Item><span>duration : </span><span>{item.duration}</span></List.Item>
+                                <List.Item><span>on_chain : </span><span>{item.on_chain}</span></List.Item>
+                                <List.Item><span>State : </span><span>{item.state}</span></List.Item>
+                                <List.Item><span>piece_cid : </span><span>{item.piece_cid}</span></List.Item>
+                                <List.Item><span>price : </span><span>{item.price}</span></List.Item>
+                                <List.Item><span>price_per_epoch : </span><span>{item.price_per_epoch}</span></List.Item>
+                                <List.Item><span>Size : </span><span>{item.size}</span></List.Item>
+                                <List.Item><span>proposal_cid : </span><span>{item.proposal_cid}</span></List.Item>
+                                <List.Item><span>provider : </span><span>{item.provider}</span></List.Item>
+                                <List.Item><span>slashed : </span><span>{item.slashed}</span></List.Item>
+                                <List.Item><span>verified : </span><span>{item.verified}</span></List.Item>
                             </List>
                         </Accordion.Panel>
                     </Accordion>
@@ -538,79 +539,20 @@ class HomeList extends Component {
 
         }
 
-        const data = [
-            {
-                month: "2015-01-01",
-                acc: 84.0,
-                type: '有效算力'
-            },
-            {
-                month: "2015-02-01",
-                acc: 14.9,
-                type: '有效算力'
-            },
-            {
-                month: "2015-03-01",
-                acc: 17.0,
-                type: '有效算力'
-            },
-            {
-                month: "2015-04-01",
-                acc: 20.2,
-                type: '有效算力'
-            },
-            {
-                month: "2015-05-01",
-                acc: 55.6,
-                type: '有效算力'
-            },
-            {
-                month: "2015-06-01",
-                acc: 56.7,
-                type: '有效算力'
-            },
-            {
-                month: "2015-07-01",
-                acc: 30.6,
-                type: '有效算力'
-            },
-            {
-                month: "2015-08-01",
-                acc: 63.2,
-                type: '有效算力'
-            },
-            {
-                month: "2015-09-01",
-                acc: -24.6,
-                type: '有效算力'
-            },
-            {
-                month: "2015-10-01",
-                acc: 14.0,
-                type: '有效算力'
-            },
-            {
-                month: "2015-11-01",
-                acc: 9.4,
-                type: '有效算力'
-            },
-            {
-                month: "2015-12-01",
-                acc: 6.3,
-                type: '有效算力'
-            }
-        ];
+        if (echartsDataList.toJS().length > 0) {
+            echartsData = echartsDataList.toJS();
+            console.log('echartsDataList------------', echartsDataList.toJS());
+        }
         const cols = {
-            month: {
+            time: {
                 nice: true,
-                alias: "月份"
+                alias: "时间"
             },
-            acc: {
+            miner_power_quality: {
                 nice: true,
-                alias: "积累量"
+                alias: "有效算力"
             }
         };
-        const colors = ["#6394f9", "#62daaa"];
 
 
         return (
@@ -651,27 +593,24 @@ class HomeList extends Component {
                             </List>
                         </div>
                         <div style={{ width: '100%', background: '#fff' }}>
-                            <Chart height={300} data={data} scale={cols} forceFit padding={[20, 30, 40, 30]}>
+                            <Chart height={300} data={echartsData} scale={cols} forceFit padding={[20, 20, 50, 85]}>
                                 <Axis
-                                    name="month"
-                                    title={null}
-                                    tickLine={null}
+                                    name="time"
                                     line={{
                                         stroke: "#E6E6E6"
                                     }}
                                 />
                                 <Axis
-                                    name="acc"
-                                    line={false}
-                                    tickLine={null}
-                                    grid={null}
-                                    title={null}
+                                    name="miner_power_quality"
+                                    label={{
+                                        formatter: val => `${val} TiB`
+                                    }}
                                 />
                                 <Tooltip />
-                                <Legend name="type" />
+                                <Legend />
                                 <Geom
                                     type="line"
-                                    position="month*acc"
+                                    position="time*miner_power_quality"
                                     size={1}
                                     color="l (270) 0:rgba(255, 146, 255, 1) .5:rgba(100, 268, 255, 1) 1:rgba(215, 0, 255, 1)"
                                     shape="smooth"
@@ -680,6 +619,13 @@ class HomeList extends Component {
                                         shadowBlur: 60,
                                         shadowOffsetY: 6
                                     }}
+                                    tooltip={['time*miner_power_quality', (time, miner_power_quality) => {
+                                        return {
+                                            name: '有效算力',
+                                            title: time,
+                                            value: miner_power_quality + ' TiB'
+                                        };
+                                    }]}
                                 />
                             </Chart>
                         </div>
@@ -712,6 +658,7 @@ class HomeList extends Component {
 const mapStateToProps = (state) => ({
     // 获取属于home页面 store中的所有数据
     isLoading: state.get('home').get('isLoading'),
+    echartsDataList: state.get('home').get('echartsDataList'),
     name: state.get('home').get('name'),
     type: state.get('home').get('type'),
     lotusOrderList: state.get('home').get('lotusOrderList')
@@ -723,6 +670,9 @@ const mapDispatchToProps = (dispatch) => ({
     },
     handleSearch: (options) => {
         dispatch(actionCreator.handleSearchAction(options))
+    },
+    handleEchartsData: () => {
+        dispatch(actionCreator.handleEchartsDataAction())
     }
 })
 
