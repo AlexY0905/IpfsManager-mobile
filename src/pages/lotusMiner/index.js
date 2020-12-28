@@ -22,7 +22,8 @@ class LotusHelp extends Component {
             modalType: '',
             modalOrder: '',
             isShowSearch: false,
-            isSearchShow: false
+            isSearchShow: false,
+            searchText: ''
         }
         this.onOpenChange = this.onOpenChange.bind(this)
         this.handleServerBtn = this.handleServerBtn.bind(this)
@@ -49,19 +50,31 @@ class LotusHelp extends Component {
         switch (type) {
             case 'list':
                 options.name = 'lotusminerstoragedealslist' // 改成后台给的name
-                this.setState({ isShowSearch: false })
+                this.setState({
+                    isShowSearch: false
+                })
                 return false
             case 'get-ask':
                 options.name = 'lotusminerstoragedealsgetask'
-                this.setState({ isShowSearch: false })
+                this.setState({
+                    isShowSearch: false
+                })
                 break
             case 'cid-info':
                 options.name = 'lotusminerpiecescidinfo'
-                this.setState({ modalOrder: 'lotusminerpiecescidinfo', isShowSearch: true })
+                this.setState({
+                    searchText: '请输入piecesCid进行搜索',
+                    modalOrder: 'lotusminerpiecescidinfo',
+                    isShowSearch: true
+                })
                 return false
             case 'status':
                 options.name = 'lotusminersectorsstatus'
-                this.setState({ modalOrder: 'lotusminersectorsstatus', isShowSearch: true })
+                this.setState({
+                    searchText: '请输入SectorId进行搜索',
+                    modalOrder: 'lotusminersectorsstatus',
+                    isShowSearch: true
+                })
                 return false
         }
 
@@ -106,15 +119,15 @@ class LotusHelp extends Component {
         let { modalType } = this.state
         const tabs = [ // 选项卡切换
             { title: 'storage-deals' },
-            // { title: 'pieces' },
-            // { title: 'sectors' }
+            { title: 'pieces' },
+            { title: 'sectors' }
         ];
         let renderContent = tabs.map((item, index) => (
             <div key={index} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '150px', backgroundColor: '#fff' }}>
                 {
                     item.title == 'storage-deals' && (
                         <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
-                            {/* <Button style={{ width: '100px' }} type="primary" size="small" onClick={() => this.handleServerBtn('list')}>list</Button> */}
+                            {/* <Button style={{ width: '100px', marginRight: '10px' }} type="primary" size="small" onClick={() => this.handleServerBtn('list')}>list</Button> */}
                             <Button style={{ width: '100px' }} type="primary" size="small" onClick={() => this.handleServerBtn('get-ask')}>get-ask</Button>
                         </div>
                     )
@@ -135,7 +148,7 @@ class LotusHelp extends Component {
         ))
         let listHtml = null
         if (lotusminerlist.toJS().length > 0) {
-            if (name == 'storagedealslist') {
+            if (name == 'lotusminerstoragedealslist') {
                 listHtml = lotusminerlist.toJS().map((item, index) => (
                     <Accordion defaultActiveKey="0" className="my-accordion">
                         <Accordion.Panel header={`ProposalCid: ${item.proposalCid}`}>
@@ -217,7 +230,7 @@ class LotusHelp extends Component {
                             this.state.isShowSearch && (
                                 <div className="search_wrap">
                                     <SearchBar
-                                        placeholder="Search"
+                                        placeholder={this.state.searchText}
                                         onSubmit={this.handleSearchBtn}
                                     />
                                 </div>

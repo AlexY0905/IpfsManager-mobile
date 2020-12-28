@@ -2,7 +2,7 @@
 import React, { Component } from 'react'
 import { NavLink } from "react-router-dom"
 import { connect } from 'react-redux'
-import {Button, Tabs, Steps, List, Checkbox} from 'antd-mobile';
+import { Button, Tabs, Steps, List, Checkbox } from 'antd-mobile';
 import "./index.css"
 import HomeSider from 'common/sider/index'
 import { actionCreator } from './store'
@@ -10,15 +10,22 @@ import { actionCreator } from './store'
 const Step = Steps.Step;
 const CheckboxItem = Checkbox.CheckboxItem;
 
+let timer = null
 class LotusHelp extends Component {
     constructor(props) {
         super(props)
         this.state = {
             open: false,
-            selectedDataList: []
+            selectedDataList: [],
+            bianYiBtn: false,
+            tongBuQuKuaiBtn: false,
+            chuShiHuaKuangGongBtn: false,
+            qiDongKuangGongBtn: false,
+            qiDongWorkerBtn: false,
+            benchceshiBtn: false
         }
         this.onOpenChange = this.onOpenChange.bind(this)
-        this.handleDeploy = this.handleDeploy.bind(this)
+        this.handleDeployBtn = this.handleDeployBtn.bind(this)
         this.serverOnChange = this.serverOnChange.bind(this)
     }
     componentDidMount() {
@@ -26,25 +33,39 @@ class LotusHelp extends Component {
         this.props.handleGetServerHostData()
     }
     onOpenChange(args) {
-        console.log(':::::::--------', args);
         this.setState({ open: !this.state.open });
     }
-    handleDeploy(type) {
-        if (type == '编译') {
-            console.log(1111111, type)
-        } else if (type == '同步区块') {
-            console.log(1111111, type)
-        } else if (type == '初始化矿工') {
-            console.log(1111111, type)
-        } else if (type == '启动矿工') {
-            console.log(1111111, type)
-        } else if (type == '启动worker') {
-            console.log(1111111, type)
+    handleDeployBtn(type) {
+        if (timer != null) {
+            clearInterval(timer)
         }
+        console.log('type--------', type)
+        let options = {
+            name: '',
+            servers: this.state.selectedDataList
+        }
+        if (type == '编译') {
+            options.name = 'lotuscompile'
+        } else if (type == '同步区块') {
+
+        } else if (type == '初始化矿工') {
+
+        } else if (type == '启动矿工') {
+
+        } else if (type == '启动worker') {
+
+        } else if (type == 'bench 测试') {
+
+        }
+        // 调用发送方函数, 处理部署操作
+        this.props.handleDeploy(options)
+        // 十五分钟定时循环查询操作的结果
+        timer = setInterval(() => {
+            // 调用发送反函数
+            this.props.handleGetQueryRes(options)
+        }, 600000)
     }
     serverOnChange(e, item) {
-        console.log(':::::::::::---------', e);
-        console.log(':::::::::::---------', item);
         let { selectedDataList } = this.state
         let arr = selectedDataList
         if (e.target.checked) {
@@ -53,6 +74,11 @@ class LotusHelp extends Component {
             }, () => {
                 console.log(22222222222, this.state.selectedDataList);
                 arr = this.state.selectedDataList
+                if (this.state.selectedDataList.length > 0) {
+                    this.setState({ bianYiBtn: false, benchceshiBtn: false })
+                } else {
+                    this.setState({ bianYiBtn: true, benchceshiBtn: true })
+                }
             })
         } else {
             arr.forEach((v, i) => {
@@ -62,10 +88,16 @@ class LotusHelp extends Component {
                         selectedDataList: arr
                     }, () => {
                         console.log(11111111111, this.state.selectedDataList);
+                        if (this.state.selectedDataList.length > 0) {
+                            this.setState({ bianYiBtn: false, benchceshiBtn: false })
+                        } else {
+                            this.setState({ bianYiBtn: true, benchceshiBtn: true })
+                        }
                     })
                 }
             })
         }
+
     }
 
 
@@ -135,28 +167,35 @@ class LotusHelp extends Component {
                 </path>
             </svg>
         )
-        let { serverhostlist } = this.props
+        let { serverhostlist, deployMsg, name } = this.props
         const tabs = [ // 选项卡切换
             { title: '部署' },
             // { title: '测试' }
-        ];
+        ]
+        if (deployMsg != '') {
+            if (name == 'lotuscompile') {
+                this.setState({ bianYiBtn: true, tongBuQuKuaiBtn: false })
+            }
+        }
+
+
         let renderContent = tabs.map((item, index) => (
-            <div style={{margin: '0 auto'}}>
+            <div style={{ margin: '0 auto' }}>
                 {
                     item.title == '部署' && (
                         <div className="step_wrap" style={{ padding: '5px' }}>
                             <Steps current={0}>
-                                <Step description={<Button type="primary" size="small" onClick={() => this.handleDeploy('编译')}>编译</Button>} icon={one()} />
-                                <Step description={<Button type="primary" size="small" onClick={() => this.handleDeploy('同步区块')}>同步区块</Button>} icon={two()} />
-                                <Step description={<Button type="primary" size="small" onClick={() => this.handleDeploy('初始化矿工')}>初始化矿工</Button>} icon={three()} />
-                                <Step description={<Button type="primary" size="small" onClick={() => this.handleDeploy('启动矿工')}>启动矿工</Button>} icon={four()} />
-                                <Step description={<Button type="primary" size="small" onClick={() => this.handleDeploy('启动worker')}>启动 worker</Button>} icon={five()} />
+                                <Step description={<Button type="primary" size="small" onClick={() => this.handleDeployBtn('编译')} disabled={this.state.bianYiBtn}>编译</Button>} icon={one()} />
+                                <Step description={<Button type="primary" size="small" onClick={() => this.handleDeployBtn('同步区块')} disabled={this.state.tongBuQuKuaiBtn}>同步区块</Button>} icon={two()} />
+                                <Step description={<Button type="primary" size="small" onClick={() => this.handleDeployBtn('初始化矿工')} disabled={this.state.chuShiHuaKuangGongBtn}>初始化矿工</Button>} icon={three()} />
+                                <Step description={<Button type="primary" size="small" onClick={() => this.handleDeployBtn('启动矿工')} disabled={this.state.qiDongKuangGongBtn}>启动矿工</Button>} icon={four()} />
+                                <Step description={<Button type="primary" size="small" onClick={() => this.handleDeployBtn('启动worker')} disabled={this.state.qiDongWorkerBtn}>启动 worker</Button>} icon={five()} />
                             </Steps>
                         </div>
                     )
                     ||
                     item.title == '测试' && (
-                        <div style={{padding: '30px 0', display: 'flex', justifyContent: 'center'}}><Button style={{marginTop: '20px auto', width: '150px'}} type="primary" size="small" onClick={() => this.handleDeploy('bench 测试')}>bench 测试</Button></div>
+                        <div style={{ padding: '30px 0', display: 'flex', justifyContent: 'center' }}><Button style={{ marginTop: '20px auto', width: '150px' }} type="primary" size="small" onClick={() => this.handleDeployBtn('bench 测试')} disabled={this.state.benchceshiBtn}>bench 测试</Button></div>
                     )
                 }
             </div>
@@ -169,7 +208,7 @@ class LotusHelp extends Component {
                     <div className="content" style={{ paddingTop: '46px' }}>
                         <div>
                             <Tabs tabs={tabs} swipeable={false} renderTabBar={props => <Tabs.DefaultTabBar {...props} page={3} onTabClick={this.handleTabsOnChange} />}>
-                                { renderContent && renderContent }
+                                {renderContent && renderContent}
                             </Tabs>
                         </div>
                         {
@@ -197,14 +236,22 @@ class LotusHelp extends Component {
 }
 // 接收方
 const mapStateToProps = (state) => ({
-    // 获取属于home页面 store中的所有数据
-    serverhostlist: state.get('lotusHelp').get('serverhostlist')
+    // 获取属于lotusHelp页面 store中的所有数据
+    serverhostlist: state.get('lotusHelp').get('serverhostlist'),
+    deployMsg: state.get('lotusHelp').get('deployMsg'),
+    name: state.get('lotusHelp').get('name')
 })
 // 发送方
 const mapDispatchToProps = (dispatch) => ({
-    // （handleGetMinerList）自定义这个函数名 用这个函数名派发action
+    // （handleGetServerHostData）自定义这个函数名 用这个函数名派发action
     handleGetServerHostData: () => { // 处理获取服务器数据列表
         dispatch(actionCreator.handleGetServerHostDataAction())
+    },
+    handleDeploy: (options) => { // 处理部署操作
+        dispatch(actionCreator.handleDeployAction(options))
+    },
+    handleGetQueryRes: (options) => { // 处理部署操作的返回信息
+        dispatch(actionCreator.handleGetQueryResAction(options))
     }
 })
 

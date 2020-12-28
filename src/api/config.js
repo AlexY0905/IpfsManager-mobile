@@ -100,6 +100,16 @@ export const API_CONFIG = {
     getSearchData: [
         '/v5/lotusinfo',
         'get'
+    ],
+    // lotus help页面 部署接口
+    getDeploy: [
+        '/v7/lotus',
+        'post'
+    ],
+    // lotus help页面 查询操作结果接口
+    getQueryRes: [
+        '/v7/lotus',
+        'post'
     ]
 }
 

@@ -32,3 +32,49 @@ export const handleGetServerHostDataAction = () => {
             })
     }
 }
+// 处理部署页面 部署操作
+const handleDeployData = (payload) => ({
+    type: types.GET_DEPLOY,
+    payload: payload
+})
+// 处理部署页面 部署操作
+export const handleDeployAction = (options) => {
+    return (dispatch, getState) => {
+        dispatch(getIsLoadingStart())
+        api.getDeploy(options)
+            .then(result => {
+                console.log(':::::::::::::::', result)
+                return false
+                dispatch(handleDeployData(result))
+            })
+            .catch(err => {
+                message.error('操作失败, 请稍后再试 !')
+            })
+            .finally(() => {
+                dispatch(getIsLoadingEnd())
+            })
+    }
+}
+// 处理部署页面 定时查询操作的返回结果
+const handleGetQueryResData = (payload) => ({
+    type: types.GET_QUERYRES,
+    payload
+})
+// 处理部署页面 定时查询操作的返回结果
+export const handleGetQueryResAction = (options) => {
+    return (dispatch, getState) => {
+        dispatch(getIsLoadingStart())
+        api.getQueryRes(options)
+            .then(result => {
+                console.log('result----------', result)
+                return false
+                dispatch(handleGetQueryResData(result))
+            })
+            .catch(err => {
+                message.error('查询结果失败, 请稍后再试 !')
+            })
+            .finally(() => {
+                dispatch(getIsLoadingEnd())
+            })
+    }
+}
