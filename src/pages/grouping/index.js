@@ -14,6 +14,7 @@ class Grouping extends Component {
     constructor(props) {
         super(props)
         this.textAreaIpt = React.createRef()
+        this.upLoadIpt = React.createRef()
         this.state = {
             open: false,
             upLoadDisable: true,
@@ -31,6 +32,7 @@ class Grouping extends Component {
         this.handleDownLoadFile = this.handleDownLoadFile.bind(this)
         this.handleDownLoadfileAddress = this.handleDownLoadfileAddress.bind(this)
         this.handleSubmitCommandBtn = this.handleSubmitCommandBtn.bind(this)
+        this.handleUpLoadIpt = this.handleUpLoadIpt.bind(this)
     }
     componentDidMount() {
         // 调用发送方的数据 显示组名列表
@@ -170,8 +172,22 @@ class Grouping extends Component {
         // return
         this.props.handleIpSsh(options)
     }
-
-
+    // ------------------------------------------------本地文件上传----------------------------------------------------
+    handleUpLoadIpt () {
+        if (this.upLoadIpt.current && this.upLoadIpt.current.files.length > 0) {
+            // 创建一个FormData空对象，然后使用append方法添加 key / value
+            var fd = new FormData();
+            for (let i = 0; i < this.upLoadIpt.current.files.length; i++) {
+                fd.append('file',this.upLoadIpt.current.files[i]);
+            }
+            console.log(':::-----', fd.getAll('file'));
+            // 调用发送方函数, 处理文件上传
+            let options = {file: fd}
+            console.log('options---------', options.file.getAll('file'))
+            return
+            this.props.handleUpLoad(options)
+        }
+    }
 
     render() {
         const { ipsshtxt, groupList } = this.props
@@ -226,6 +242,10 @@ class Grouping extends Component {
                 <div style={{ overflow: 'hidden', padding: '0', margin: '0' }}>
                     <HomeSider open={this.state.open} activeTxt="分组批量命令" />
                     <div className="content" style={{paddingTop: '50px'}}>
+                        <div style={{position: 'relative'}}>
+                            <input ref={this.upLoadIpt} className='upload_ipt' type='file' multiple onChange={this.handleUpLoadIpt} />
+                            <Button className='upload_btn' type="primary" size='small' multiple>本地文件上传</Button>
+                        </div>
                         <div className='fileUpload_wrap'>
                             <InputItem clear={true} placeholder="输入上传的地址" onChange={this.handlefileAddress} style={{ fontSize: '15px' }}></InputItem>
                             <Button style={{marginTop: '5px'}} disabled={this.state.upLoadDisable} type="primary" size="small" onClick={this.handleUpLoadBtn}>上传</Button>
@@ -287,6 +307,9 @@ const mapDispatchToProps = (dispatch) => ({
     },
     handleGetGroupList: () => { // 处理获取组名数据列表
         dispatch(actionCreator.handleGetGroupListAction())
+    },
+    handleUpLoad: (options) => { // 处理文件上传
+        dispatch(actionCreator.handleUpLoadAction(options))
     }
 })
 

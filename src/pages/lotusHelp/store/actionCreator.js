@@ -44,7 +44,6 @@ export const handleDeployAction = (options) => {
         api.getDeploy(options)
             .then(result => {
                 console.log(':::::::::::::::', result)
-                return false
                 dispatch(handleDeployData(result))
             })
             .catch(err => {
@@ -67,8 +66,41 @@ export const handleGetQueryResAction = (options) => {
         api.getQueryRes(options)
             .then(result => {
                 console.log('result----------', result)
+                if (result.code == 0) { // 执行成功
+                    Toast.success('执行成功')
+                    return false
+                } else if (result.code == 1) { // 执行失败
+                    Toast.fail('执行失败, 稍后再试 ... ')
+                    return false
+                } else if (result.code == 2) { // 正在执行中
+                    Toast.info('正在执行中, 稍后再看 ... ')
+                    return false
+                }
+            })
+            .catch(err => {
+                message.error('查询结果失败, 请稍后再试 !')
+            })
+            .finally(() => {
+                dispatch(getIsLoadingEnd())
+            })
+    }
+}
+
+// 处理部署页面 文件上传
+export const handleUpLoadAction = (options) => {
+    return (dispatch, getState) => {
+        dispatch(getIsLoadingStart())
+        api.fileUpLoad(options)
+            .then(result => {
+                console.log('result----------', result)
                 return false
-                dispatch(handleGetQueryResData(result))
+                if (result.code == 0) {
+                    Toast.success(`${result.name} 上传成功`)
+                    return false
+                } else {
+                    Toast.fail(`${result.name} 上传失败`)
+                    return false
+                }
             })
             .catch(err => {
                 message.error('查询结果失败, 请稍后再试 !')

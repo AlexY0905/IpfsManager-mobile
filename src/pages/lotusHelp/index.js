@@ -2,7 +2,7 @@
 import React, { Component } from 'react'
 import { NavLink } from "react-router-dom"
 import { connect } from 'react-redux'
-import { Button, Tabs, Steps, List, Checkbox } from 'antd-mobile';
+import { Button, Tabs, Steps, List, Checkbox, Modal } from 'antd-mobile';
 import "./index.css"
 import HomeSider from 'common/sider/index'
 import { actionCreator } from './store'
@@ -10,23 +10,42 @@ import { actionCreator } from './store'
 const Step = Steps.Step;
 const CheckboxItem = Checkbox.CheckboxItem;
 
+// function closest(el, selector) {
+//     const matchesSelector = el.matches || el.webkitMatchesSelector || el.mozMatchesSelector || el.msMatchesSelector;
+//     while (el) {
+//         if (matchesSelector.call(el, selector)) {
+//             return el;
+//         }
+//         el = el.parentElement;
+//     }
+//     return null;
+// }
 let timer = null
 class LotusHelp extends Component {
     constructor(props) {
         super(props)
+        this.upLoadIpt = React.createRef()
         this.state = {
             open: false,
+            name: '',
             selectedDataList: [],
-            bianYiBtn: false,
-            tongBuQuKuaiBtn: false,
-            chuShiHuaKuangGongBtn: false,
-            qiDongKuangGongBtn: false,
-            qiDongWorkerBtn: false,
-            benchceshiBtn: false
+            bianYiBtn: true,
+            tongBuQuKuaiBtn: true,
+            chuShiHuaKuangGongBtn: true,
+            qiDongKuangGongBtn: true,
+            qiDongWorkerBtn: true,
+            benchceshiBtn: true,
+            isUpLoadBtn: true,
+            deployMsgModal: false
         }
         this.onOpenChange = this.onOpenChange.bind(this)
         this.handleDeployBtn = this.handleDeployBtn.bind(this)
         this.serverOnChange = this.serverOnChange.bind(this)
+        // this.handleUpLoadBtn = this.handleUpLoadBtn.bind(this)
+        this.handleUpLoadIpt = this.handleUpLoadIpt.bind(this)
+        this.handleDeployResBtn = this.handleDeployResBtn.bind(this)
+        this.onWrapTouchStart = this.onWrapTouchStart.bind(this)
+        this.deployMsgModalClose = this.deployMsgModalClose.bind(this)
     }
     componentDidMount() {
         // 调用发送方的数据 显示服务器列表
@@ -46,6 +65,7 @@ class LotusHelp extends Component {
         }
         if (type == '编译') {
             options.name = 'lotuscompile'
+            this.setState({name: 'lotuscompile'})
         } else if (type == '同步区块') {
 
         } else if (type == '初始化矿工') {
@@ -59,11 +79,6 @@ class LotusHelp extends Component {
         }
         // 调用发送方函数, 处理部署操作
         this.props.handleDeploy(options)
-        // 十五分钟定时循环查询操作的结果
-        timer = setInterval(() => {
-            // 调用发送反函数
-            this.props.handleGetQueryRes(options)
-        }, 600000)
     }
     serverOnChange(e, item) {
         let { selectedDataList } = this.state
@@ -75,9 +90,9 @@ class LotusHelp extends Component {
                 console.log(22222222222, this.state.selectedDataList);
                 arr = this.state.selectedDataList
                 if (this.state.selectedDataList.length > 0) {
-                    this.setState({ bianYiBtn: false, benchceshiBtn: false })
+                    this.setState({ bianYiBtn: false, benchceshiBtn: false, isUpLoadBtn: false })
                 } else {
-                    this.setState({ bianYiBtn: true, benchceshiBtn: true })
+                    this.setState({ bianYiBtn: true, benchceshiBtn: true, isUpLoadBtn: true })
                 }
             })
         } else {
@@ -89,17 +104,49 @@ class LotusHelp extends Component {
                     }, () => {
                         console.log(11111111111, this.state.selectedDataList);
                         if (this.state.selectedDataList.length > 0) {
-                            this.setState({ bianYiBtn: false, benchceshiBtn: false })
+                            this.setState({ bianYiBtn: false, benchceshiBtn: false, isUpLoadBtn: false })
                         } else {
-                            this.setState({ bianYiBtn: true, benchceshiBtn: true })
+                            this.setState({ bianYiBtn: true, benchceshiBtn: true, isUpLoadBtn: true })
                         }
                     })
                 }
             })
         }
-
     }
-
+    handleUpLoadIpt () {
+        if (this.upLoadIpt.current && this.upLoadIpt.current.files.length > 0) {
+            // 创建一个FormData空对象，然后使用append方法添加 key / value
+            var fd = new FormData();
+            for (let i = 0; i < this.upLoadIpt.current.files.length; i++) {
+                fd.append('file',this.upLoadIpt.current.files[i]);
+            }
+            console.log(':::-----', fd.getAll('file'));
+            // 调用发送方函数, 处理文件上传
+            let options = {file: fd}
+            this.props.handleUpLoad(options)
+        }
+    }
+    handleDeployResBtn () {
+        let options = {
+            name: this.state.name,
+            servers: this.state.selectedDataList
+        }
+        // 调用发送方函数, 处理查看执行结果
+        this.props.handleGetQueryRes(options)
+    }
+    onWrapTouchStart (e) {
+        // fix touch to scroll background page on iOS
+        if (!/iPhone|iPod|iPad/i.test(navigator.userAgent)) {
+            return;
+        }
+        const pNode = closest(e.target, '.am-modal-content');
+        if (!pNode) {
+            e.preventDefault();
+        }
+    }
+    deployMsgModalClose () {
+        this.setState({deployMsgModal: false})
+    }
 
 
     render() {
@@ -170,14 +217,30 @@ class LotusHelp extends Component {
         let { serverhostlist, deployMsg, name } = this.props
         const tabs = [ // 选项卡切换
             { title: '部署' },
-            // { title: '测试' }
+            { title: '测试' },
+            { title: '结果' }
         ]
-        if (deployMsg != '') {
+        let deployMsgHtml = null
+        if (deployMsg.toJS().length > 0) {
+            deployMsgHtml = deployMsg.toJS().map((item, index) => {
+                if (item.Result) {
+                    return (
+                        <div>
+                            <p>{item.Host} 执行成功</p><br />
+                        </div>
+                    )
+                } else {
+                    return (
+                        <div>
+                            <p>{item.Host} 执行失败</p><br />
+                        </div>
+                    )
+                }
+            })
             if (name == 'lotuscompile') {
-                this.setState({ bianYiBtn: true, tongBuQuKuaiBtn: false })
+                this.setState({ bianYiBtn: true, chuShiHuaKuangGongBtn: false })
             }
         }
-
 
         let renderContent = tabs.map((item, index) => (
             <div style={{ margin: '0 auto' }}>
@@ -186,16 +249,20 @@ class LotusHelp extends Component {
                         <div className="step_wrap" style={{ padding: '5px' }}>
                             <Steps current={0}>
                                 <Step description={<Button type="primary" size="small" onClick={() => this.handleDeployBtn('编译')} disabled={this.state.bianYiBtn}>编译</Button>} icon={one()} />
-                                <Step description={<Button type="primary" size="small" onClick={() => this.handleDeployBtn('同步区块')} disabled={this.state.tongBuQuKuaiBtn}>同步区块</Button>} icon={two()} />
-                                <Step description={<Button type="primary" size="small" onClick={() => this.handleDeployBtn('初始化矿工')} disabled={this.state.chuShiHuaKuangGongBtn}>初始化矿工</Button>} icon={three()} />
-                                <Step description={<Button type="primary" size="small" onClick={() => this.handleDeployBtn('启动矿工')} disabled={this.state.qiDongKuangGongBtn}>启动矿工</Button>} icon={four()} />
-                                <Step description={<Button type="primary" size="small" onClick={() => this.handleDeployBtn('启动worker')} disabled={this.state.qiDongWorkerBtn}>启动 worker</Button>} icon={five()} />
+                                {/*<Step description={<Button type="primary" size="small" onClick={() => this.handleDeployBtn('同步区块')} disabled={this.state.tongBuQuKuaiBtn}>同步区块</Button>} icon={two()} />*/}
+                                <Step description={<Button type="primary" size="small" onClick={() => this.handleDeployBtn('初始化矿工')} disabled={this.state.chuShiHuaKuangGongBtn}>初始化矿工</Button>} icon={two()} />
+                                <Step description={<Button type="primary" size="small" onClick={() => this.handleDeployBtn('启动矿工')} disabled={this.state.qiDongKuangGongBtn}>启动矿工</Button>} icon={three()} />
+                                <Step description={<Button type="primary" size="small" onClick={() => this.handleDeployBtn('启动worker')} disabled={this.state.qiDongWorkerBtn}>启动 worker</Button>} icon={four()} />
                             </Steps>
                         </div>
                     )
                     ||
                     item.title == '测试' && (
                         <div style={{ padding: '30px 0', display: 'flex', justifyContent: 'center' }}><Button style={{ marginTop: '20px auto', width: '150px' }} type="primary" size="small" onClick={() => this.handleDeployBtn('bench 测试')} disabled={this.state.benchceshiBtn}>bench 测试</Button></div>
+                    )
+                    ||
+                    item.title == '结果' && (
+                        <div style={{ padding: '30px 0', display: 'flex', justifyContent: 'center' }}><Button style={{ marginTop: '20px auto', width: '150px' }} type="primary" size="small" onClick={() => this.handleDeployResBtn()}>查看执行结果</Button></div>
                     )
                 }
             </div>
@@ -211,23 +278,39 @@ class LotusHelp extends Component {
                                 {renderContent && renderContent}
                             </Tabs>
                         </div>
-                        {
-                            /*
-                            <div className="ip_wrap">
-                                <div>
-                                    <List renderHeader={() => '服务器IP地址'}>
-                                        {
-                                            serverhostlist.toJS().length > 0 && serverhostlist.toJS().map(item => (
-                                                <CheckboxItem key={item.id} onChange={(e) => this.serverOnChange(e, item)}>
-                                                    {item.host}
-                                                </CheckboxItem>
-                                            ))
-                                        }
-                                    </List>
-                                </div>
+                        <div style={{position: 'relative'}}>
+                            <input ref={this.upLoadIpt} className='upload_ipt' type='file' multiple onChange={this.handleUpLoadIpt} />
+                            <Button className='upload_btn' type="primary" size='small' multiple>脚本上传</Button>
+                        </div>
+                        <div className="ip_wrap">
+                            <div>
+                                <List renderHeader={() => '服务器IP地址'}>
+                                    {
+                                        serverhostlist.toJS().length > 0 && serverhostlist.toJS().map(item => (
+                                            <CheckboxItem key={item.id} onChange={(e) => this.serverOnChange(e, item)}>
+                                                {item.host}
+                                            </CheckboxItem>
+                                        ))
+                                    }
+                                </List>
                             </div>
-                             */
-                        }
+                        </div>
+                        <div className="deployMsg_wrap">
+                            <Modal
+                                visible={this.state.deployMsgModal}
+                                transparent
+                                maskClosable={false}
+                                onClose={this.deployMsgModalClose}
+                                title="结果"
+                                footer={[{ text: 'Ok', onPress: () => { this.deployMsgModalClose() } }]}
+                                wrapProps={{ onTouchStart: this.onWrapTouchStart }}
+                                afterClose={() => { }}
+                            >
+                                <div style={{ height: 100, overflow: 'scroll' }}>
+                                    { deployMsgHtml != null && deployMsgHtml }
+                                </div>
+                            </Modal>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -252,6 +335,9 @@ const mapDispatchToProps = (dispatch) => ({
     },
     handleGetQueryRes: (options) => { // 处理部署操作的返回信息
         dispatch(actionCreator.handleGetQueryResAction(options))
+    },
+    handleUpLoad: (options) => { // 处理文件上传
+        dispatch(actionCreator.handleUpLoadAction(options))
     }
 })
 

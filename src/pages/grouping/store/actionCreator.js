@@ -103,3 +103,28 @@ export const handleDownFileAction = (options) => {
             })
     }
 }
+
+// 分组批量命令页面, 处理本地文件上传
+export const handleUpLoadAction = (options) => {
+    return (dispatch, getState) => {
+        dispatch(getIsLoadingStart())
+        api.localFileUpLoad(options)
+            .then(result => {
+                console.log('result----------', result)
+                return false
+                if (result.code == 0) {
+                    Toast.success(`${result.name} 上传成功`)
+                    return false
+                } else {
+                    Toast.fail(`${result.name} 上传失败`)
+                    return false
+                }
+            })
+            .catch(err => {
+                message.error('查询结果失败, 请稍后再试 !')
+            })
+            .finally(() => {
+                dispatch(getIsLoadingEnd())
+            })
+    }
+}

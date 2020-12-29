@@ -19,3 +19,17 @@
 .command_wrap {
     background: #000000;
 }
+.upload_btn {
+    width: 98%;
+    margin: 10px auto;
+    z-index: -1;
+}
+.upload_ipt {
+    width: 98%;
+    height: 30px;
+    background: red;
+    position: absolute;
+    right: 1%;
+    top: 0;
+    /*opacity: 0;*/
+}

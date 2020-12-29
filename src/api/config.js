@@ -110,6 +110,16 @@ export const API_CONFIG = {
     getQueryRes: [
         '/v7/lotus',
         'post'
+    ],
+    // lotus help页面 文件上传接口
+    fileUpLoad: [
+        '/v7/uploadshell',
+        'post'
+    ],
+    // lotus help页面 本地文件上传接口
+    localFileUpLoad: [
+        '/v3/localupload',
+        'post'
     ]
 }
 

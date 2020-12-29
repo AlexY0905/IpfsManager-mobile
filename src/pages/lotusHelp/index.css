@@ -10,3 +10,16 @@
     overflow-y: scroll;
     margin-bottom: 20px;
 }
+.upload_btn {
+    width: 50%;
+    margin: 10px auto;
+    z-index: -1;
+}
+.upload_ipt {
+    width: 50%;
+    height: 30px;
+    position: absolute;
+    right: 25%;
+    top: 0;
+    opacity: 0;
+}

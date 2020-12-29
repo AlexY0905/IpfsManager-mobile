@@ -593,7 +593,7 @@ class HomeList extends Component {
                             </List>
                         </div>
                         <div style={{ width: '100%', background: '#fff' }}>
-                            <Chart height={300} data={echartsData} scale={cols} forceFit padding={[20, 20, 50, 85]}>
+                            <Chart height={300} data={echartsData} scale={cols} forceFit padding={[20, 20, 50, 70]}>
                                 <Axis
                                     name="time"
                                     line={{
