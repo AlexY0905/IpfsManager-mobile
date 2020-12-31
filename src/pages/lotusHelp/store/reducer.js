@@ -6,7 +6,9 @@ const defaultState = fromJS({
     serverhostlist: [],
     isLoading: false,
     deployMsg: [],
-    name: ''
+    name: '',
+    queryResName: '',
+    queryResCode: ''
 })
 // 以下action是从actionCreator.js里面 handleLtclistData()来到  payload参数想当于result
 export default (state = defaultState, action) => {
@@ -32,15 +34,14 @@ export default (state = defaultState, action) => {
     // 处理部署操作
     if (action.type == types.GET_DEPLOY) {
         return state.merge({
-            deployMsg: fromJS(action.payload.msg), // 将数据数组转换成immutable
-            name: action.payload.name
+            deployMsg: fromJS(action.payload.msg) // 将数据数组转换成immutable
         })
     }
     // 处理查询操作的返回结果
     if (action.type == types.GET_QUERYRES) {
         return state.merge({
-            deployMsg: action.payload.msg,
-            name: action.payload.name
+            queryResName: action.payload.name,
+            queryResCode: action.payload.queryResCode
         })
     }
 

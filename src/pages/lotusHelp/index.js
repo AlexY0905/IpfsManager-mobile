@@ -10,17 +10,18 @@ import { actionCreator } from './store'
 const Step = Steps.Step;
 const CheckboxItem = Checkbox.CheckboxItem;
 
-// function closest(el, selector) {
-//     const matchesSelector = el.matches || el.webkitMatchesSelector || el.mozMatchesSelector || el.msMatchesSelector;
-//     while (el) {
-//         if (matchesSelector.call(el, selector)) {
-//             return el;
-//         }
-//         el = el.parentElement;
-//     }
-//     return null;
-// }
+function closest(el, selector) {
+    const matchesSelector = el.matches || el.webkitMatchesSelector || el.mozMatchesSelector || el.msMatchesSelector;
+    while (el) {
+        if (matchesSelector.call(el, selector)) {
+            return el;
+        }
+        el = el.parentElement;
+    }
+    return null;
+}
 let timer = null
+let isDeployMsgModal = true
 class LotusHelp extends Component {
     constructor(props) {
         super(props)
@@ -65,17 +66,24 @@ class LotusHelp extends Component {
         }
         if (type == '编译') {
             options.name = 'lotuscompile'
-            this.setState({name: 'lotuscompile'})
+            this.setState({name: 'lotuscompile', bianYiBtn: true})
         } else if (type == '同步区块') {
 
         } else if (type == '初始化矿工') {
-
+            options.name = 'minerinit'
+            this.setState({name: 'minerinit', chuShiHuaKuangGongBtn: true})
         } else if (type == '启动矿工') {
-
-        } else if (type == '启动worker') {
-
+            options.name = 'minerrun'
+            this.setState({name: 'minerrun', qiDongKuangGongBtn: true})
+        } else if (type == '启动 worker') {
+            options.name = 'workerrun'
+            this.setState({name: 'workerrun', qiDongWorkerBtn: true})
+        } else if (type == 'bench 编译') {
+            options.name = 'benchcompile'
+            this.setState({name: 'benchcompile', benchCompile: true})
         } else if (type == 'bench 测试') {
-
+            options.name = 'benchrun'
+            this.setState({name: 'benchrun', benchceshiBtn: true})
         }
         // 调用发送方函数, 处理部署操作
         this.props.handleDeploy(options)
@@ -214,7 +222,7 @@ class LotusHelp extends Component {
                 </path>
             </svg>
         )
-        let { serverhostlist, deployMsg, name } = this.props
+        let { serverhostlist, deployMsg, queryResCode, queryResName } = this.props
         const tabs = [ // 选项卡切换
             { title: '部署' },
             { title: '测试' },
@@ -222,23 +230,47 @@ class LotusHelp extends Component {
         ]
         let deployMsgHtml = null
         if (deployMsg.toJS().length > 0) {
-            deployMsgHtml = deployMsg.toJS().map((item, index) => {
-                if (item.Result) {
-                    return (
-                        <div>
-                            <p>{item.Host} 执行成功</p><br />
-                        </div>
-                    )
-                } else {
-                    return (
-                        <div>
-                            <p>{item.Host} 执行失败</p><br />
-                        </div>
-                    )
-                }
-            })
-            if (name == 'lotuscompile') {
-                this.setState({ bianYiBtn: true, chuShiHuaKuangGongBtn: false })
+            if (isDeployMsgModal) {
+                this.setState({deployMsgModal: true})
+                isDeployMsgModal = false
+            }
+            deployMsgHtml = deployMsg.toJS().map((item, index) => (
+                <div>
+                    {
+                        item.Result && (
+                            <p>{item.Host} 执行成功</p>
+                        )
+                        ||
+                        (
+                            <p style={{color: 'red'}}>{item.Host} 执行失败</p>
+                        )
+                    }
+                </div>
+            ))
+        }
+        if (queryResCode == 0 && queryResName != '') { // 执行成功 改变按钮状态
+            if (queryResName == 'lotuscompile') {
+                this.setState({chuShiHuaKuangGongBtn: false})
+            } else if (queryResName == 'minerinit') {
+                this.setState({qiDongKuangGongBtn: false})
+            } else if (queryResName == 'minerrun') {
+                this.setState({qiDongWorkerBtn: false})
+            } else if (queryResName == 'benchcompile') {
+                this.setState({benchceshiBtn: false})
+            }
+        } else if (queryResCode != 0 && queryResName != '') { // 执行失败 改变按钮状态
+            if (queryResName == 'lotuscompile') {
+                this.setState({bianYiBtn: false})
+            } else if (queryResName == 'minerinit') {
+                this.setState({chuShiHuaKuangGongBtn: false})
+            } else if (queryResName == 'minerrun') {
+                this.setState({qiDongKuangGongBtn: false})
+            } else if (queryResName == 'workerrun') {
+                this.setState({qiDongWorkerBtn: false})
+            } else if (queryResName == 'benchcompile') {
+                this.setState({benchCompile: false})
+            } else if (queryResName == 'benchrun') {
+                this.setState({benchceshiBtn: false})
             }
         }
 
@@ -295,22 +327,24 @@ class LotusHelp extends Component {
                                 </List>
                             </div>
                         </div>
-                        <div className="deployMsg_wrap">
-                            <Modal
-                                visible={this.state.deployMsgModal}
-                                transparent
-                                maskClosable={false}
-                                onClose={this.deployMsgModalClose}
-                                title="结果"
-                                footer={[{ text: 'Ok', onPress: () => { this.deployMsgModalClose() } }]}
-                                wrapProps={{ onTouchStart: this.onWrapTouchStart }}
-                                afterClose={() => { }}
-                            >
-                                <div style={{ height: 100, overflow: 'scroll' }}>
-                                    { deployMsgHtml != null && deployMsgHtml }
+                        {
+                            deployMsgHtml != null && (
+                                <div className="deployMsg_wrap">
+                                    <Modal
+                                        visible={this.state.deployMsgModal}
+                                        transparent
+                                        maskClosable={false}
+                                        title="结果"
+                                        footer={[{ text: 'Ok', onPress: () => { this.deployMsgModalClose() } }]}
+                                        wrapProps={{ onTouchStart: this.onWrapTouchStart }}
+                                    >
+                                        <div style={{ height: 100, overflow: 'scroll' }}>
+                                            { deployMsgHtml }
+                                        </div>
+                                    </Modal>
                                 </div>
-                            </Modal>
-                        </div>
+                            )
+                        }
                     </div>
                 </div>
             </div>
@@ -322,7 +356,9 @@ const mapStateToProps = (state) => ({
     // 获取属于lotusHelp页面 store中的所有数据
     serverhostlist: state.get('lotusHelp').get('serverhostlist'),
     deployMsg: state.get('lotusHelp').get('deployMsg'),
-    name: state.get('lotusHelp').get('name')
+    name: state.get('lotusHelp').get('name'),
+    queryResName: state.get('lotusHelp').get('queryResName'),
+    queryResCode: state.get('lotusHelp').get('queryResCode')
 })
 // 发送方
 const mapDispatchToProps = (dispatch) => ({

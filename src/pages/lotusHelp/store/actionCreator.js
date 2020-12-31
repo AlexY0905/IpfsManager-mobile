@@ -47,7 +47,7 @@ export const handleDeployAction = (options) => {
                 dispatch(handleDeployData(result))
             })
             .catch(err => {
-                message.error('操作失败, 请稍后再试 !')
+                Toast.fail('操作失败, 请稍后再试 !')
             })
             .finally(() => {
                 dispatch(getIsLoadingEnd())
@@ -68,17 +68,19 @@ export const handleGetQueryResAction = (options) => {
                 console.log('result----------', result)
                 if (result.code == 0) { // 执行成功
                     Toast.success('执行成功')
+                    dispatch(handleGetQueryResData(result))
                     return false
                 } else if (result.code == 1) { // 执行失败
                     Toast.fail('执行失败, 稍后再试 ... ')
+                    dispatch(handleGetQueryResData(result))
                     return false
                 } else if (result.code == 2) { // 正在执行中
-                    Toast.info('正在执行中, 稍后再看 ... ')
+                    Toast.fail('正在执行中, 稍后再看 ... ')
                     return false
                 }
             })
             .catch(err => {
-                message.error('查询结果失败, 请稍后再试 !')
+                Toast.fail('查询结果失败, 请稍后再试 !')
             })
             .finally(() => {
                 dispatch(getIsLoadingEnd())
@@ -103,7 +105,7 @@ export const handleUpLoadAction = (options) => {
                 }
             })
             .catch(err => {
-                message.error('查询结果失败, 请稍后再试 !')
+                Toast.fail('查询结果失败, 请稍后再试 !')
             })
             .finally(() => {
                 dispatch(getIsLoadingEnd())
