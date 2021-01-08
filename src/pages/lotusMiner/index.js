@@ -32,8 +32,8 @@ class LotusHelp extends Component {
 
     }
     componentDidMount() {
-        // 在生命周期调用发送方的数据
-
+        // 在生命周期调用发送方的数据, 处理minerInfo数据
+        // this.props.handleMinerInfo()
     }
     onOpenChange(args) {
         console.log(':::::::--------', args);
@@ -57,7 +57,8 @@ class LotusHelp extends Component {
             case 'get-ask':
                 options.name = 'lotusminerstoragedealsgetask'
                 this.setState({
-                    isShowSearch: false
+                    modalOrder: 'lotusminerstoragedealsgetask',
+                    isShowSearch: true
                 })
                 break
             case 'cid-info':
@@ -115,8 +116,7 @@ class LotusHelp extends Component {
 
 
     render() {
-        let { name, type, lotusminerlist } = this.props
-        let { modalType } = this.state
+        let { name, type, lotusminerlist, lotusMinerInfo } = this.props
         const tabs = [ // 选项卡切换
             { title: 'storage-deals' },
             { title: 'pieces' },
@@ -164,11 +164,12 @@ class LotusHelp extends Component {
                         </Accordion.Panel>
                     </Accordion>
                 ))
-            } else if (name == 'lotusminerstoragedealsgetask') {
+            } else if (name == 'lotusminerstoragedealsgetask' && type) {
                 listHtml = lotusminerlist.toJS().map((item, index) => (
                     <Accordion defaultActiveKey="0" className="my-accordion">
-                        <Accordion.Panel header={`Expiry: ${item.expiry}`}>
+                        <Accordion.Panel header={`Expiry: ${item.ask}`}>
                             <List className="my-list">
+                                <List.Item><span>Ask : </span><span>{item.ask}</span></List.Item>
                                 <List.Item><span>Expiry : </span><span>{item.expiry}</span></List.Item>
                                 <List.Item><span>MaxpieceSize : </span><span>{item.max_piece_size}</span></List.Item>
                                 <List.Item><span>MinpieceSize : </span><span>{item.min_piece_size}</span></List.Item>
@@ -220,6 +221,18 @@ class LotusHelp extends Component {
                 ))
             }
         }
+        let minerInfoHtml = null
+        if (lotusMinerInfo.toJS().length > 0) {
+            minerInfoHtml = lotusMinerInfo.toJS().map((item, index) => (
+                <Accordion defaultActiveKey="0" className="my-accordion">
+                    <Accordion.Panel header='minerInfo'>
+                        <List className="my-list">
+                            <List.Item><span>Id : </span><span>{item.id}</span></List.Item>
+                        </List>
+                    </Accordion.Panel>
+                </Accordion>
+            ))
+        }
 
         return (
             <div>
@@ -246,6 +259,11 @@ class LotusHelp extends Component {
                                 {listHtml != null && listHtml}
                             </List>
                         </div>
+                        <div className="minerInfo_wrap">
+                            <List renderHeader={() => 'minerInfo'} className="my-list">
+                                {minerInfoHtml != null && minerInfoHtml}
+                            </List>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -258,7 +276,8 @@ const mapStateToProps = (state) => ({
     isLoading: state.get('lotusMiner').get('isLoading'),
     name: state.get('lotusMiner').get('name'),
     type: state.get('lotusMiner').get('type'),
-    lotusminerlist: state.get('lotusMiner').get('lotusminerlist')
+    lotusminerlist: state.get('lotusMiner').get('lotusminerlist'),
+    lotusMinerInfo: state.get('lotusMiner').get('lotusMinerInfo')
 })
 // 发送方
 const mapDispatchToProps = (dispatch) => ({
@@ -268,6 +287,9 @@ const mapDispatchToProps = (dispatch) => ({
     },
     handleSearch: (options) => {
         dispatch(actionCreator.handleSearchAction(options))
+    },
+    handleMinerInfo: () => {
+        dispatch(actionCreator.handleMinerInfoAction())
     }
 })
 

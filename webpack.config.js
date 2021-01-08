@@ -40,7 +40,7 @@ module.exports = {
             {
                 test: /\.css$/,
                 use: [
-                    {loader: 'style-loader'},
+                    { loader: 'style-loader' },
                     {
                         loader: MiniCssExtractPlugin.loader,
                         options: {
@@ -131,7 +131,7 @@ module.exports = {
                     '/v6',
                     '/v7'
                 ],
-                target: 'http://61.147.123.84:10011' // lotus-jp接口地址
+                target: 'http://61.147.123.88:10011' // lotus-jp接口地址
             }
         ],
         historyApiFallback: true//让h5路由不向后端发送请求
