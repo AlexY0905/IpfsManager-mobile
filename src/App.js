@@ -6,6 +6,7 @@ import Login from 'pages/login/index';
 import Home from 'pages/home/index';
 import LotusHelp from 'pages/lotusHelp/index';
 import LotusMiner from 'pages/lotusMiner/index';
+import Overview from 'pages/overview/index';
 import ServerManage from 'pages/serverManage/index';
 import Monitor from 'pages/monitor/index';
 import Ipssh from 'pages/ipssh/index';
@@ -47,6 +48,7 @@ function App() {
           <ProtectRoute exact path='/' component={LotusHelp} />
           <ProtectRoute path='/home' component={Home} />
           <ProtectRoute path='/lotusminer' component={LotusMiner} />
+          <ProtectRoute path='/overview' component={Overview} />
           <ProtectRoute path='/serverManage' component={ServerManage} />
           <ProtectRoute path='/Monitor' component={Monitor} />
           <ProtectRoute path='/ipssh' component={Ipssh} />

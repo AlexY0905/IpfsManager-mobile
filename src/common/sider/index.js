@@ -24,6 +24,10 @@ class HomeSider extends Component {
                     path: '/lotusminer'
                 },
                 {
+                    name: '矿工概览',
+                    path: '/overview'
+                },
+                {
                     name: '资产管理',
                     path: '/serverManage'
                 },
