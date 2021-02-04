@@ -168,10 +168,6 @@ class HomeList extends Component {
     }
     handleSubmitSearch() {
         const { sectorAddress, sectorNumber, modalOrder } = this.state
-        console.log('sectorAddress----------', sectorAddress)
-        console.log('sectorNumber----------', sectorNumber)
-        console.log('modalOrder----------', modalOrder)
-
         if (sectorAddress == '') {
             Toast.fail('miner address 不能为空 !')
             return false
@@ -225,23 +221,23 @@ class HomeList extends Component {
         let { modalType } = this.state
         let echartsData = []
         const tabs = [
-            { title: 'lotus wallet' },
-            { title: 'lotus client' },
-            { title: 'lotus mpool' },
-            { title: 'lotus state' },
-            { title: 'lotus chain' }
+            { title: 'lotus 钱包' },
+            { title: 'lotus 客户端' },
+            { title: 'lotus 消息池' },
+            { title: 'lotus 状态' },
+            { title: 'lotus 链信息' }
         ];
         let renderContent = tabs.map((item, index) => (
             <div key={index} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '150px', backgroundColor: '#fff' }}>
                 {
-                    item.title == 'lotus wallet' && <Button style={{ minWidth: '100px' }} type="primary" size="small" onClick={() => this.handleServerBtn('list')}>list</Button>
+                    item.title == 'lotus 钱包' && <Button style={{ minWidth: '100px' }} type="primary" size="small" onClick={() => this.handleServerBtn('list')}>list</Button>
                     ||
-                    item.title == 'lotus client' &&
+                    item.title == 'lotus 客户端' &&
                     <div>
                         <Button style={{ minWidth: '100px' }} type="primary" size="small" onClick={() => this.handleServerBtn('list-deals')}>list-deals</Button>
                     </div>
                     ||
-                    item.title == 'lotus mpool' && (
+                    item.title == 'lotus 消息池' && (
                         <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', padding: '5px' }}>
                             <Button style={{ minWidth: '100px', marginBottom: '5px' }} type="primary" size="small" onClick={() => this.handleServerBtn('pending')}>pending</Button>
                             <Button style={{ minWidth: '100px', marginBottom: '5px' }} type="primary" size="small" onClick={() => this.handleServerBtn('find')}>find</Button>
@@ -250,7 +246,7 @@ class HomeList extends Component {
                         </div>
                     )
                     ||
-                    item.title == 'lotus state' && (
+                    item.title == 'lotus 状态' && (
                         <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', padding: '5px' }}>
                             <Button style={{ minWidth: '100px', marginBottom: '5px' }} type="primary" size="small" onClick={() => this.handleServerBtn('power')}>power</Button>
                             <Button style={{ minWidth: '100px', marginBottom: '5px' }} type="primary" size="small" onClick={() => this.handleServerBtn('active-sectors')}>active-sectors</Button>
@@ -263,7 +259,7 @@ class HomeList extends Component {
                         </div>
                     )
                     ||
-                    item.title == 'lotus chain' && (
+                    item.title == 'lotus 链信息' && (
                         <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', padding: '5px' }}>
                             {/* <Button style={{ minWidth: '100px', marginRight: '5px', marginBottom: '5px' }} type="primary" size="small" onClick={() => this.handleServerBtn('getblock')}>getblock</Button> */}
                             <Button style={{ minWidth: '100px', marginRight: '5px', marginBottom: '5px' }} type="primary" size="small" onClick={() => this.handleServerBtn('getmessage')}>getmessage</Button>

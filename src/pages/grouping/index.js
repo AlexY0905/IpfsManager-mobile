@@ -39,7 +39,6 @@ class Grouping extends Component {
         this.props.handleGetGroupList()
     }
     onOpenChange(args) {
-        console.log(':::::::--------', args);
         this.setState({ open: !this.state.open });
     }
     // -------------------------------------------------文件上传功能-----------------------------------------------------
@@ -75,7 +74,6 @@ class Grouping extends Component {
                 ipAddress: groupSelectedDataList
             }
             console.log(222222222222, options);
-            return
             this.props.handleUpLoadFile(options)
         }
     }
@@ -111,7 +109,6 @@ class Grouping extends Component {
                 ipAddress: groupSelectedDataList
             }
             console.log(222222222222, options);
-            return
             // 调用发送方函数, 处理文件的下载
             this.props.handleDownFile(options)
         }
@@ -182,10 +179,7 @@ class Grouping extends Component {
             }
             console.log(':::-----', fd.getAll('file'));
             // 调用发送方函数, 处理文件上传
-            let options = {file: fd}
-            console.log('options---------', options.file.getAll('file'))
-            return
-            this.props.handleUpLoad(options)
+            this.props.handleUpLoad(fd)
         }
     }
 
@@ -193,7 +187,7 @@ class Grouping extends Component {
         const { ipsshtxt, groupList } = this.props
         let groupDataList = []
         if (groupList.toJS().length > 0) {
-            console.log(111111111, groupList.toJS());
+            // console.log(111111111, groupList.toJS());
             groupDataList = groupList.toJS().map((item, index) => {
                 if (item.Title.Servers == null) {
                     item.Title.Servers = []
@@ -242,7 +236,7 @@ class Grouping extends Component {
                 <div style={{ overflow: 'hidden', padding: '0', margin: '0' }}>
                     <HomeSider open={this.state.open} activeTxt="分组批量命令" />
                     <div className="content" style={{paddingTop: '50px'}}>
-                        <div style={{position: 'relative'}}>
+                        <div style={{position: 'relative', zIndex: '99'}}>
                             <input ref={this.upLoadIpt} className='upload_ipt' type='file' multiple onChange={this.handleUpLoadIpt} />
                             <Button className='upload_btn' type="primary" size='small' multiple>本地文件上传</Button>
                         </div>
@@ -293,9 +287,11 @@ const mapStateToProps = (state) => ({
 
 // 发送方
 const mapDispatchToProps = (dispatch) => ({
+    /*
     handleGetServerHostData: () => { // 处理获取服务器数据列表
         dispatch(actionCreator.handleGetServerHostDataAction())
     },
+     */
     handleIpSsh: (options) => { // 处理服务器的批量命令
         dispatch(actionCreator.handleIpSshAction(options))
     },

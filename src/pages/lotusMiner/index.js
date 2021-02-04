@@ -33,7 +33,7 @@ class LotusHelp extends Component {
     }
     componentDidMount() {
         // 在生命周期调用发送方的数据, 处理minerInfo数据
-        // this.props.handleMinerInfo()
+        this.props.handleMinerInfo()
     }
     onOpenChange(args) {
         console.log(':::::::--------', args);
@@ -60,7 +60,7 @@ class LotusHelp extends Component {
                     modalOrder: 'lotusminerstoragedealsgetask',
                     isShowSearch: true
                 })
-                break
+                return false
             case 'cid-info':
                 options.name = 'lotusminerpiecescidinfo'
                 this.setState({
@@ -118,27 +118,27 @@ class LotusHelp extends Component {
     render() {
         let { name, type, lotusminerlist, lotusMinerInfo } = this.props
         const tabs = [ // 选项卡切换
-            { title: 'storage-deals' },
-            { title: 'pieces' },
-            { title: 'sectors' }
+            { title: '存储交易' },
+            { title: '片信息' },
+            { title: '区块信息' }
         ];
         let renderContent = tabs.map((item, index) => (
             <div key={index} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '150px', backgroundColor: '#fff' }}>
                 {
-                    item.title == 'storage-deals' && (
+                    item.title == '存储交易' && (
                         <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
                             {/* <Button style={{ width: '100px', marginRight: '10px' }} type="primary" size="small" onClick={() => this.handleServerBtn('list')}>list</Button> */}
                             <Button style={{ width: '100px' }} type="primary" size="small" onClick={() => this.handleServerBtn('get-ask')}>get-ask</Button>
                         </div>
                     )
                     ||
-                    item.title == 'pieces' && (
+                    item.title == '片信息' && (
                         <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
                             <Button style={{ width: '100px' }} type="primary" size="small" onClick={() => this.handleServerBtn('cid-info')}>cid-info</Button>
                         </div>
                     )
                     ||
-                    item.title == 'sectors' && (
+                    item.title == '区块信息' && (
                         <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
                             <Button style={{ width: '100px' }} type="primary" size="small" onClick={() => this.handleServerBtn('status')}>status</Button>
                         </div>
@@ -227,7 +227,7 @@ class LotusHelp extends Component {
                 <Accordion defaultActiveKey="0" className="my-accordion">
                     <Accordion.Panel header='minerInfo'>
                         <List className="my-list">
-                            <List.Item><span>Id : </span><span>{item.id}</span></List.Item>
+                            <List.Item><span>{Object.keys(item)} : </span><span>{Object.values(item)}</span></List.Item>
                         </List>
                     </Accordion.Panel>
                 </Accordion>

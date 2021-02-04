@@ -44,7 +44,11 @@ export const handleDeployAction = (options) => {
         api.getDeploy(options)
             .then(result => {
                 console.log(':::::::::::::::', result)
-                dispatch(handleDeployData(result))
+                if (result.code == 0) {
+                    dispatch(handleDeployData(result))
+                } else {
+                    Toast.fail('操作失败, 请稍后再试 !')
+                }
             })
             .catch(err => {
                 Toast.fail('操作失败, 请稍后再试 !')
@@ -66,21 +70,21 @@ export const handleGetQueryResAction = (options) => {
         api.getQueryRes(options)
             .then(result => {
                 console.log('result----------', result)
-                if (result.code == 0) { // 执行成功
-                    Toast.success('执行成功')
+                if (result.code == 0) { // 全部执行完毕, 并且成功
                     dispatch(handleGetQueryResData(result))
-                    return false
-                } else if (result.code == 1) { // 执行失败
-                    Toast.fail('执行失败, 稍后再试 ... ')
+                } else if (result.code == 1) { // 正在执行中
                     dispatch(handleGetQueryResData(result))
+                } else if (result.code == 4) { // 暂无可查询的指令
+                    Toast.fail(result.msg)
                     return false
-                } else if (result.code == 2) { // 正在执行中
-                    Toast.fail('正在执行中, 稍后再看 ... ')
+                } else if (result.code == 2) { // 执行失败 网络错误
+                    Toast.fail('网络错误, 请稍后再试 !')
+                    dispatch(handleGetQueryResData(result))
                     return false
                 }
             })
             .catch(err => {
-                Toast.fail('查询结果失败, 请稍后再试 !')
+                Toast.fail('网络错误, 请稍后再试 !')
             })
             .finally(() => {
                 dispatch(getIsLoadingEnd())
@@ -92,20 +96,25 @@ export const handleGetQueryResAction = (options) => {
 export const handleUpLoadAction = (options) => {
     return (dispatch, getState) => {
         dispatch(getIsLoadingStart())
-        api.fileUpLoad(options)
+        api.scriptFileUpLoad(options)
             .then(result => {
                 console.log('result----------', result)
-                return false
-                if (result.code == 0) {
-                    Toast.success(`${result.name} 上传成功`)
+                if (result.code == 0) { // 文件上传成功
+                    Toast.success('上传成功')
                     return false
-                } else {
-                    Toast.fail(`${result.name} 上传失败`)
+                } else if (result.code == 1) { // 文件上传失败
+                    Toast.fail(`${result.name.join(',')} 上传失败`)
+                    return false
+                } else if (result.code == 2) { // 配置文件不存在
+                    Toast.fail(`配置文件不存在`)
+                    return false
+                } else if (result.code == 3) { // 配置文件不正确
+                    Toast.fail(`配置文件不正确`)
                     return false
                 }
             })
             .catch(err => {
-                Toast.fail('查询结果失败, 请稍后再试 !')
+                Toast.fail('网络错误, 请稍后再试 !')
             })
             .finally(() => {
                 dispatch(getIsLoadingEnd())

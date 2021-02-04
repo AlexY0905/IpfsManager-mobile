@@ -22,7 +22,7 @@ export const handleGetGroupListAction = () => {
         dispatch(getIsLoadingStart())
         api.getGroupList()
             .then(result => {
-                console.log(':::::::::::::::------', result)
+                // console.log(':::::::::::::::------', result)
                 if (result.code == 0) {
                     let data = result.msg == null ? [] : result.msg
                     dispatch(handleGetGroupListData(data))
@@ -108,20 +108,22 @@ export const handleDownFileAction = (options) => {
 export const handleUpLoadAction = (options) => {
     return (dispatch, getState) => {
         dispatch(getIsLoadingStart())
-        api.localFileUpLoad(options)
+        api.batchUpLoadFile(options)
             .then(result => {
                 console.log('result----------', result)
-                return false
-                if (result.code == 0) {
-                    Toast.success(`${result.name} 上传成功`)
+                if (result.code == 0) { // 文件上传成功
+                    Toast.success('上传成功')
                     return false
-                } else {
-                    Toast.fail(`${result.name} 上传失败`)
+                } else if (result.code == 1) { // 文件上传失败
+                    Toast.fail(`${result.name.join(',')} 上传失败`)
+                    return false
+                } else if (result.code == 2) { // 文件已存在
+                    Toast.fail(`${result.name.join(',')} 文件已存在`)
                     return false
                 }
             })
             .catch(err => {
-                message.error('查询结果失败, 请稍后再试 !')
+                Toast.fail('网络错误, 稍后再试')
             })
             .finally(() => {
                 dispatch(getIsLoadingEnd())

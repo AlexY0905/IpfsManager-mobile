@@ -2,7 +2,7 @@
 import React, { Component } from 'react'
 import { NavLink } from "react-router-dom"
 import { connect } from 'react-redux'
-import { Button, Tabs, Steps, List, Checkbox, Modal } from 'antd-mobile';
+import {Button, Tabs, Steps, List, Checkbox, Modal, InputItem, Toast} from 'antd-mobile';
 import "./index.css"
 import HomeSider from 'common/sider/index'
 import { actionCreator } from './store'
@@ -22,6 +22,7 @@ function closest(el, selector) {
 }
 let timer = null
 let isDeployMsgModal = true
+let isOneRender = true
 class LotusHelp extends Component {
     constructor(props) {
         super(props)
@@ -31,13 +32,21 @@ class LotusHelp extends Component {
             name: '',
             selectedDataList: [],
             bianYiBtn: true,
+            shouHuBtn: true,
             tongBuQuKuaiBtn: true,
             chuShiHuaKuangGongBtn: true,
             qiDongKuangGongBtn: true,
             qiDongWorkerBtn: true,
             benchceshiBtn: true,
+            benchCompile: true,
             isUpLoadBtn: true,
-            deployMsgModal: false
+            deployMsgModal: false,
+            workRunModal: false,
+            process: '',
+            benchCeShiBtnModal: false,
+            benchCeShiIptVal: '',
+            benchBianYiBtnModal: false,
+            benchBianYiIptVal: ''
         }
         this.onOpenChange = this.onOpenChange.bind(this)
         this.handleDeployBtn = this.handleDeployBtn.bind(this)
@@ -47,6 +56,19 @@ class LotusHelp extends Component {
         this.handleDeployResBtn = this.handleDeployResBtn.bind(this)
         this.onWrapTouchStart = this.onWrapTouchStart.bind(this)
         this.deployMsgModalClose = this.deployMsgModalClose.bind(this)
+        this.onCloseWorkRunModal = this.onCloseWorkRunModal.bind(this)
+        this.handleWorkRunIpt = this.handleWorkRunIpt.bind(this)
+        this.workRuModalOkBtn = this.workRuModalOkBtn.bind(this)
+
+        this.handleBenchCeShiModalCancel = this.handleBenchCeShiModalCancel.bind(this)
+        this.handleBenchCeShiModalOk = this.handleBenchCeShiModalOk.bind(this)
+        this.handleBenchCeShiIpt = this.handleBenchCeShiIpt.bind(this)
+
+        this.handleBenchBianYiModalCancel = this.handleBenchBianYiModalCancel.bind(this)
+        this.handleBenchBianYiModalOk = this.handleBenchBianYiModalOk.bind(this)
+        this.handleBenchBianYiIpt = this.handleBenchBianYiIpt.bind(this)
+
+
     }
     componentDidMount() {
         // 调用发送方的数据 显示服务器列表
@@ -59,7 +81,7 @@ class LotusHelp extends Component {
         if (timer != null) {
             clearInterval(timer)
         }
-        console.log('type--------', type)
+        isOneRender = true
         let options = {
             name: '',
             servers: this.state.selectedDataList
@@ -67,23 +89,32 @@ class LotusHelp extends Component {
         if (type == '编译') {
             options.name = 'lotuscompile'
             this.setState({name: 'lotuscompile', bianYiBtn: true})
-        } else if (type == '同步区块') {
-
+            window.localStorage.setItem("commandName", 'lotuscompile')
+        } else if (type == '进程守护') {
+            options.name = 'lotusdaemon'
+            this.setState({name: 'lotusdaemon', shouHuBtn: true})
+            window.localStorage.setItem("commandName", 'lotusdaemon')
         } else if (type == '初始化矿工') {
             options.name = 'minerinit'
             this.setState({name: 'minerinit', chuShiHuaKuangGongBtn: true})
+            window.localStorage.setItem("commandName", 'minerinit')
         } else if (type == '启动矿工') {
             options.name = 'minerrun'
             this.setState({name: 'minerrun', qiDongKuangGongBtn: true})
-        } else if (type == '启动 worker') {
+            window.localStorage.setItem("commandName", 'minerrun')
+        } else if (type == '启动worker') {
             options.name = 'workerrun'
-            this.setState({name: 'workerrun', qiDongWorkerBtn: true})
+            this.setState({name: 'workerrun', qiDongWorkerBtn: true, workRunModal: true})
+            window.localStorage.setItem("commandName", 'workerrun')
+            return false
         } else if (type == 'bench 编译') {
             options.name = 'benchcompile'
             this.setState({name: 'benchcompile', benchCompile: true})
+            window.localStorage.setItem("commandName", 'benchcompile')
         } else if (type == 'bench 测试') {
             options.name = 'benchrun'
             this.setState({name: 'benchrun', benchceshiBtn: true})
+            window.localStorage.setItem("commandName", 'benchrun')
         }
         // 调用发送方函数, 处理部署操作
         this.props.handleDeploy(options)
@@ -96,6 +127,7 @@ class LotusHelp extends Component {
                 selectedDataList: [...selectedDataList, item]
             }, () => {
                 console.log(22222222222, this.state.selectedDataList);
+                window.localStorage.setItem("commandHostList", JSON.stringify(this.state.selectedDataList))
                 arr = this.state.selectedDataList
                 if (this.state.selectedDataList.length > 0) {
                     this.setState({ bianYiBtn: false, benchceshiBtn: false, isUpLoadBtn: false })
@@ -111,6 +143,7 @@ class LotusHelp extends Component {
                         selectedDataList: arr
                     }, () => {
                         console.log(11111111111, this.state.selectedDataList);
+                        window.localStorage.setItem("commandHostList", JSON.stringify(this.state.selectedDataList))
                         if (this.state.selectedDataList.length > 0) {
                             this.setState({ bianYiBtn: false, benchceshiBtn: false, isUpLoadBtn: false })
                         } else {
@@ -130,14 +163,18 @@ class LotusHelp extends Component {
             }
             console.log(':::-----', fd.getAll('file'));
             // 调用发送方函数, 处理文件上传
-            let options = {file: fd}
-            this.props.handleUpLoad(options)
+            // let options = {file: fd}
+            this.props.handleUpLoad(fd)
         }
     }
     handleDeployResBtn () {
+        if (!window.localStorage.getItem("commandName")) {
+            Toast.fail('当前没有执行的机器', 1);
+            return false
+        }
         let options = {
-            name: this.state.name,
-            servers: this.state.selectedDataList
+            name: window.localStorage.getItem("commandName"),
+            servers: JSON.parse(window.localStorage.getItem("commandHostList"))
         }
         // 调用发送方函数, 处理查看执行结果
         this.props.handleGetQueryRes(options)
@@ -154,6 +191,75 @@ class LotusHelp extends Component {
     }
     deployMsgModalClose () {
         this.setState({deployMsgModal: false})
+    }
+    onCloseWorkRunModal () {
+        this.setState({workRunModal: false})
+    }
+    handleWorkRunIpt (val) {
+        console.log(12312312312, val)
+        this.setState({process: val})
+    }
+    workRuModalOkBtn () {
+        /*
+        if (this.state.process == '') {
+            Toast.fail('输入框不能为空 !', 1);
+            return false
+        }
+        */
+
+        let options = {
+            name: 'workerrun',
+            process: this.state.process
+        }
+        // 调用发送方函数, 处理部署操作
+        this.props.handleDeploy(options)
+        this.setState({workRunModal: false})
+    }
+
+    handleBenchCeShiModalCancel () {
+        this.setState({benchCeShiBtnModal: false})
+    }
+    handleBenchCeShiModalOk () {
+        /*
+        if (this.state.benchCeShiIptVal == '') {
+            Toast.fail('输入框不能为空 !');
+            return false
+        }
+        */
+
+        let options = {
+            name: 'benchrun',
+            process: this.state.benchCeShiIptVal
+        }
+        // 调用发送方函数, 处理部署
+        this.props.handleDeploy(options)
+        this.setState({benchCeShiBtnModal: false})
+    }
+    handleBenchCeShiIpt (val) {
+        this.setState({benchCeShiIptVal: val})
+    }
+
+    handleBenchBianYiModalCancel () {
+        this.setState({benchBianYiBtnModal: false})
+    }
+    handleBenchBianYiModalOk () {
+        /*
+        if (this.state.benchBianYiIptVal == '') {
+            Toast.fail('输入框不能为空 !');
+            return false
+        }
+        */
+
+        let options = {
+            name: 'benchcompile',
+            process: this.state.benchBianYiIptVal
+        }
+        // 调用发送方函数, 处理部署
+        this.props.handleDeploy(options)
+        this.setState({benchBianYiBtnModal: false})
+    }
+    handleBenchBianYiIpt (val) {
+        this.setState({benchBianYiIptVal: val})
     }
 
 
@@ -222,7 +328,7 @@ class LotusHelp extends Component {
                 </path>
             </svg>
         )
-        let { serverhostlist, deployMsg, queryResCode, queryResName } = this.props
+        let { serverhostlist, deployMsg, queryResCode, queryResName, queryResMsg } = this.props
         const tabs = [ // 选项卡切换
             { title: '部署' },
             { title: '测试' },
@@ -247,20 +353,54 @@ class LotusHelp extends Component {
                     }
                 </div>
             ))
+        } else if (queryResMsg.toJS().length > 0) {
+            if (isDeployMsgModal) {
+                this.setState({deployMsgModal: true})
+                isDeployMsgModal = false
+            }
+            deployMsgHtml = queryResMsg.toJS().map((item, index) => (
+                <div>
+                    {
+                        item.Code == 0 && (
+                            <p>{item.Host} 执行成功</p>
+                        )
+                        ||
+                        item.Code == 1 && (
+                            <p style={{color: 'red'}}>{item.Host} 执行失败</p>
+                        )
+                        ||
+                        item.Code == 2 && (
+                            <p>{item.Host} 正在执行中,稍后再看</p>
+                        )
+                        ||
+                        item.Code == 3 && (
+                            <p>{item.Host} 查询失败</p>
+                        )
+                    }
+                </div>
+            ))
         }
-        if (queryResCode == 0 && queryResName != '') { // 执行成功 改变按钮状态
+
+        if (isOneRender && queryResCode == 0 && queryResName != '') { // 执行成功 改变按钮状态
             if (queryResName == 'lotuscompile') {
-                this.setState({chuShiHuaKuangGongBtn: false})
-            } else if (queryResName == 'minerinit') {
+                this.setState({shouHuBtn: false})
+            } else if (queryResName == 'lotusdaemon') {
                 this.setState({qiDongKuangGongBtn: false})
             } else if (queryResName == 'minerrun') {
                 this.setState({qiDongWorkerBtn: false})
+            } else if (queryResName == 'workerrun') {
+                this.setState({lotuscompile: false})
+            } else if (queryResName == 'benchrun') {
+                this.setState({benchCompile: false})
             } else if (queryResName == 'benchcompile') {
                 this.setState({benchceshiBtn: false})
             }
-        } else if (queryResCode != 0 && queryResName != '') { // 执行失败 改变按钮状态
+            isOneRender = false
+        } else if (isOneRender && queryResCode != 0 && queryResCode != 1 && queryResName != '') { // 执行失败 改变按钮状态
             if (queryResName == 'lotuscompile') {
                 this.setState({bianYiBtn: false})
+            } else if (queryResName == 'lotusdaemon') {
+                this.setState({shouHuBtn: false})
             } else if (queryResName == 'minerinit') {
                 this.setState({chuShiHuaKuangGongBtn: false})
             } else if (queryResName == 'minerrun') {
@@ -272,7 +412,9 @@ class LotusHelp extends Component {
             } else if (queryResName == 'benchrun') {
                 this.setState({benchceshiBtn: false})
             }
+            isOneRender = false
         }
+
 
         let renderContent = tabs.map((item, index) => (
             <div style={{ margin: '0 auto' }}>
@@ -281,16 +423,24 @@ class LotusHelp extends Component {
                         <div className="step_wrap" style={{ padding: '5px' }}>
                             <Steps current={0}>
                                 <Step description={<Button type="primary" size="small" onClick={() => this.handleDeployBtn('编译')} disabled={this.state.bianYiBtn}>编译</Button>} icon={one()} />
-                                {/*<Step description={<Button type="primary" size="small" onClick={() => this.handleDeployBtn('同步区块')} disabled={this.state.tongBuQuKuaiBtn}>同步区块</Button>} icon={two()} />*/}
-                                <Step description={<Button type="primary" size="small" onClick={() => this.handleDeployBtn('初始化矿工')} disabled={this.state.chuShiHuaKuangGongBtn}>初始化矿工</Button>} icon={two()} />
-                                <Step description={<Button type="primary" size="small" onClick={() => this.handleDeployBtn('启动矿工')} disabled={this.state.qiDongKuangGongBtn}>启动矿工</Button>} icon={three()} />
-                                <Step description={<Button type="primary" size="small" onClick={() => this.handleDeployBtn('启动worker')} disabled={this.state.qiDongWorkerBtn}>启动 worker</Button>} icon={four()} />
+                                <Step description={<Button type="primary" size="small" onClick={() => this.handleDeployBtn('进程守护')} disabled={this.state.shouHuBtn}>进程守护</Button>} icon={two()} />
+                                {
+                                    /*
+                                    <Step description={<Button type="primary" size="small" onClick={() => this.handleDeployBtn('初始化矿工')} disabled={this.state.chuShiHuaKuangGongBtn}>初始化矿工</Button>} icon={three()} />
+                                     */
+                                }
+                                <Step description={<Button type="primary" size="small" onClick={() => this.handleDeployBtn('启动矿工')} disabled={this.state.qiDongKuangGongBtn}>启动矿工</Button>} icon={four()} />
+                                <Step description={<Button type="primary" size="small" onClick={() => this.handleDeployBtn('启动worker')} disabled={this.state.qiDongWorkerBtn}>启动 worker</Button>} icon={five()} />
+                                {/*<Step description={<Button type="primary" size="small" onClick={() => this.handleDeployBtn('启动worker')}>启动 worker</Button>} icon={five()} />*/}
                             </Steps>
                         </div>
                     )
                     ||
                     item.title == '测试' && (
-                        <div style={{ padding: '30px 0', display: 'flex', justifyContent: 'center' }}><Button style={{ marginTop: '20px auto', width: '150px' }} type="primary" size="small" onClick={() => this.handleDeployBtn('bench 测试')} disabled={this.state.benchceshiBtn}>bench 测试</Button></div>
+                        <div>
+                            <div style={{ padding: '30px 0', display: 'flex', justifyContent: 'center' }}><Button style={{ marginTop: '20px auto', width: '150px' }} type="primary" size="small" onClick={() => this.handleDeployBtn('bench 测试')} disabled={this.state.benchceshiBtn}>bench 测试</Button></div>
+                            <div style={{ padding: '30px 0', display: 'flex', justifyContent: 'center' }}><Button style={{ marginTop: '20px auto', width: '150px' }} type="primary" size="small" onClick={() => this.handleDeployBtn('bench 编译')} disabled={this.state.benchCompile}>bench 编译</Button></div>
+                        </div>
                     )
                     ||
                     item.title == '结果' && (
@@ -311,8 +461,8 @@ class LotusHelp extends Component {
                             </Tabs>
                         </div>
                         <div style={{position: 'relative'}}>
-                            <input ref={this.upLoadIpt} className='upload_ipt' type='file' multiple onChange={this.handleUpLoadIpt} />
-                            <Button className='upload_btn' type="primary" size='small' multiple>脚本上传</Button>
+                            <input ref={this.upLoadIpt} style={{zIndex: '999'}} className='upload_ipt' type='file' multiple onChange={this.handleUpLoadIpt} />
+                            <Button className='upload_btn' style={{zIndex: '99'}} type="primary" size='small' multiple>脚本上传</Button>
                         </div>
                         <div className="ip_wrap">
                             <div>
@@ -345,6 +495,42 @@ class LotusHelp extends Component {
                                 </div>
                             )
                         }
+                        <Modal
+                            transparent={true}
+                            visible={this.state.workRunModal}
+                            onClose={this.onCloseWorkRunModal}
+                            animationType="slide-up"
+                            afterClose={() => { console.log('afterClose'); }}
+                        >
+                            <div>
+                                <InputItem style={{border: '1px solid #ccc'}} placeholder="输入节点" onChange={this.handleWorkRunIpt} style={{ fontSize: '15px' }}></InputItem>
+                            </div>
+                            <div><Button type="primary" size='small' onClick={this.workRuModalOkBtn}>编译</Button></div>
+                        </Modal>
+                        <Modal
+                            transparent={true}
+                            visible={this.state.benchCeShiBtnModal}
+                            onClose={this.handleBenchCeShiModalCancel}
+                            animationType="slide-up"
+                            afterClose={() => { console.log('afterClose'); }}
+                        >
+                            <div>
+                                <InputItem style={{border: '1px solid #ccc'}} placeholder="输入节点" onChange={this.handleBenchCeShiIpt} style={{ fontSize: '15px' }}></InputItem>
+                            </div>
+                            <div><Button type="primary" size='small' onClick={this.handleBenchCeShiModalOk}>执行</Button></div>
+                        </Modal>
+                        <Modal
+                            transparent={true}
+                            visible={this.state.benchBianYiBtnModal}
+                            onClose={this.handleBenchBianYiModalCancel}
+                            animationType="slide-up"
+                            afterClose={() => { console.log('afterClose'); }}
+                        >
+                            <div>
+                                <InputItem style={{border: '1px solid #ccc'}} placeholder="输入节点" onChange={this.handleBenchBianYiIpt} style={{ fontSize: '15px' }}></InputItem>
+                            </div>
+                            <div><Button type="primary" size='small' onClick={this.handleBenchBianYiModalOk}>执行</Button></div>
+                        </Modal>
                     </div>
                 </div>
             </div>
@@ -358,7 +544,8 @@ const mapStateToProps = (state) => ({
     deployMsg: state.get('lotusHelp').get('deployMsg'),
     name: state.get('lotusHelp').get('name'),
     queryResName: state.get('lotusHelp').get('queryResName'),
-    queryResCode: state.get('lotusHelp').get('queryResCode')
+    queryResCode: state.get('lotusHelp').get('queryResCode'),
+    queryResMsg: state.get('lotusHelp').get('queryResMsg')
 })
 // 发送方
 const mapDispatchToProps = (dispatch) => ({
@@ -372,7 +559,7 @@ const mapDispatchToProps = (dispatch) => ({
     handleGetQueryRes: (options) => { // 处理部署操作的返回信息
         dispatch(actionCreator.handleGetQueryResAction(options))
     },
-    handleUpLoad: (options) => { // 处理文件上传
+    handleUpLoad: (options) => { // 处理脚本文件上传
         dispatch(actionCreator.handleUpLoadAction(options))
     }
 })

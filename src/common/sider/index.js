@@ -63,6 +63,7 @@ class HomeSider extends Component {
     }
 
     componentDidMount() {
+        console.log('参数sider----------', this.props.isBack);
         let menuBox = document.querySelector('.my-drawer')
         menuBox.style.display = 'none'
         window.addEventListener('scroll', () => {
@@ -169,7 +170,11 @@ class HomeSider extends Component {
                     <div style={{ position: 'fixed', top: '0', left: '0', width: '100%', zIndex: '9999' }}>
                         <div className="clear_flot">
                             <NavBar
-                                icon={<img src={require('../../../public/images/menu.png')} style={{ width: '25px' }} />}
+                                icon={
+                                    this.props.isBack == undefined && <img src={require('../../../public/images/menu.png')} style={{ width: '25px' }} />
+                                    ||
+                                    this.props.isBack && <img src={require('../../../public/images/backIcon.png')} style={{ width: '25px' }} onClick={() => window.history.go(-1)} />
+                                }
                                 onLeftClick={this.onOpenChange}
                                 rightContent={<Icon type="ellipsis" onClick={this.showModal} />}>
                                 {this.props.activeTxt}
@@ -178,7 +183,7 @@ class HomeSider extends Component {
                     </div>
                     <Drawer
                         className="my-drawer"
-                        style={{ minHeight: document.documentElement.clientHeight }}
+                        style={{ minHeight: document.documentElement.clientHeight, zIndex: '9992' }}
                         enableDragHandle
                         contentStyle={{ color: '#A6A6A6', textAlign: 'center', paddingTop: 42 }}
                         sidebar={sidebar}

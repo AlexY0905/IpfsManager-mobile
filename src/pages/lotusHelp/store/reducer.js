@@ -8,7 +8,8 @@ const defaultState = fromJS({
     deployMsg: [],
     name: '',
     queryResName: '',
-    queryResCode: ''
+    queryResCode: '',
+    queryResMsg: []
 })
 // 以下action是从actionCreator.js里面 handleLtclistData()来到  payload参数想当于result
 export default (state = defaultState, action) => {
@@ -41,7 +42,8 @@ export default (state = defaultState, action) => {
     if (action.type == types.GET_QUERYRES) {
         return state.merge({
             queryResName: action.payload.name,
-            queryResCode: action.payload.queryResCode
+            queryResCode: action.payload.code,
+            queryResMsg: fromJS(action.payload.msg) // 将数据数组转换成immutable
         })
     }
 

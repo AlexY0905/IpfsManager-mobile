@@ -307,9 +307,9 @@ class ServerManage extends Component {
                 console.log('cols------------', cols);
                 console.log('rows-------------', rows);
                 if (this.username === undefined) {
-                    var url = (location.protocol === "http:" ? "ws" : "wss") + "://" + "61.147.123.84:10011" + "/ws" + "?" + "msg=" + msg + "&rows=" + rows + "&cols=" + cols;
+                    var url = (location.protocol === "http:" ? "ws" : "wss") + "://" + "61.147.123.88:10011" + "/ws" + "?" + "msg=" + msg + "&rows=" + rows + "&cols=" + cols;
                 } else {
-                    var url = (location.protocol === "http:" ? "ws" : "wss") + "://" + "61.147.123.84:10011" + "/ws" + "?" + "msg=" + msg + "&rows=" + rows + "&cols=" + cols + "&username=" + data.username + "&password=" + data.password;
+                    var url = (location.protocol === "http:" ? "ws" : "wss") + "://" + "61.147.123.88:10011" + "/ws" + "?" + "msg=" + msg + "&rows=" + rows + "&cols=" + cols + "&username=" + data.username + "&password=" + data.password;
                 }
                 let terminalContainer = this.terminalDom.current
 

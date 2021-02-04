@@ -20,8 +20,13 @@ export const handleLotusMinerAction = (options) => {
         api.getLotusMiner(options)
             .then((result) => {
                 console.log('::::::::-------', result)
-                // 将后台请求过来的成功数据, 派发action, 到store
-                dispatch(handleLotusMinerData(result))
+                if (result.code == 1) {
+                    Toast.fail('暂无数据, 请稍后再试 !')
+                    return false
+                } else {
+                    // 将后台请求过来的成功数据, 派发action, 到store
+                    dispatch(handleLotusMinerData(result))
+                }
             })
             .catch((err) => {
                 Toast.fail('获取数据失败, 请稍后再试 !')
@@ -60,8 +65,11 @@ export const handleMinerInfoAction = () => {
         api.getMinerInfoData()
             .then((result) => {
                 console.log('result---------', result)
-                return
-                dispatch(handleMinerInfoData(result))
+                let data = []
+                for (let key in result.msg) {
+                    data.push({[key]: result.msg[key]})
+                }
+                dispatch(handleMinerInfoData(data))
             })
             .catch((err) => {
                 message.error('获取数据失败, 请稍后再试 !')

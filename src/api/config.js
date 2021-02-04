@@ -46,7 +46,7 @@ export const API_CONFIG = {
         '/v3/multissh',
         'post'
     ],
-    // 批量命令, 文件上传
+    // 批量命令, 本地文件上传到服务器
     uploadfile: [
         '/v3/uploadfile',
         'post'
@@ -54,6 +54,11 @@ export const API_CONFIG = {
     // 批量命令, 文件下载
     downloadfile: [
         '/v3/downloadfile',
+        'post'
+    ],
+    // 批量命令, 批量文件上传
+    batchUpLoadFile: [
+        '/v3/mobilelocalupload',
         'post'
     ],
     // 添加组页面, 添加组接口
@@ -103,7 +108,7 @@ export const API_CONFIG = {
     ],
     // lotusMiner页面 获取minerInfo数据接口
     getMinerInfoData: [
-        '/v5/lotusinfo',
+        '/v6/minerinfo',
         'get'
     ],
     // lotus help页面 部署接口
@@ -113,7 +118,7 @@ export const API_CONFIG = {
     ],
     // lotus help页面 查询操作结果接口
     getQueryRes: [
-        '/v7/lotus',
+        '/v7/lotusresult',
         'post'
     ],
     // lotus help页面 文件上传接口
@@ -122,9 +127,21 @@ export const API_CONFIG = {
         'post'
     ],
     // lotus help页面 本地文件上传接口
+    /*
     localFileUpLoad: [
         '/v3/localupload',
         'post'
+    ],
+     */
+    // lotus help页面 脚本文件上传接口
+    scriptFileUpLoad: [
+        '/v7/mobileuploadshell',
+        'post'
+    ],
+    // 矿工概览页面 数据接口
+    getOverviewData: [
+        '/v6/minersummary',
+        'get'
     ]
 }
 
