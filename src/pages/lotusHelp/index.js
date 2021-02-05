@@ -109,12 +109,14 @@ class LotusHelp extends Component {
             return false
         } else if (type == 'bench 编译') {
             options.name = 'benchcompile'
-            this.setState({name: 'benchcompile', benchCompile: true})
+            this.setState({name: 'benchcompile', benchCompile: true, benchBianYiBtnModal: true})
             window.localStorage.setItem("commandName", 'benchcompile')
+            return false
         } else if (type == 'bench 测试') {
             options.name = 'benchrun'
-            this.setState({name: 'benchrun', benchceshiBtn: true})
+            this.setState({name: 'benchrun', benchceshiBtn: true, benchCeShiBtnModal: true})
             window.localStorage.setItem("commandName", 'benchrun')
+            return false
         }
         // 调用发送方函数, 处理部署操作
         this.props.handleDeploy(options)
@@ -130,9 +132,9 @@ class LotusHelp extends Component {
                 window.localStorage.setItem("commandHostList", JSON.stringify(this.state.selectedDataList))
                 arr = this.state.selectedDataList
                 if (this.state.selectedDataList.length > 0) {
-                    this.setState({ bianYiBtn: false, benchceshiBtn: false, isUpLoadBtn: false })
+                    this.setState({ bianYiBtn: false, benchCompile: false, isUpLoadBtn: false })
                 } else {
-                    this.setState({ bianYiBtn: true, benchceshiBtn: true, isUpLoadBtn: true })
+                    this.setState({ bianYiBtn: true, benchCompile: true, isUpLoadBtn: true })
                 }
             })
         } else {
@@ -145,9 +147,9 @@ class LotusHelp extends Component {
                         console.log(11111111111, this.state.selectedDataList);
                         window.localStorage.setItem("commandHostList", JSON.stringify(this.state.selectedDataList))
                         if (this.state.selectedDataList.length > 0) {
-                            this.setState({ bianYiBtn: false, benchceshiBtn: false, isUpLoadBtn: false })
+                            this.setState({ bianYiBtn: false, benchCompile: false, isUpLoadBtn: false })
                         } else {
-                            this.setState({ bianYiBtn: true, benchceshiBtn: true, isUpLoadBtn: true })
+                            this.setState({ bianYiBtn: true, benchCompile: true, isUpLoadBtn: true })
                         }
                     })
                 }
@@ -200,16 +202,10 @@ class LotusHelp extends Component {
         this.setState({process: val})
     }
     workRuModalOkBtn () {
-        /*
-        if (this.state.process == '') {
-            Toast.fail('输入框不能为空 !', 1);
-            return false
-        }
-        */
-
         let options = {
             name: 'workerrun',
-            process: this.state.process
+            process: this.state.process,
+            servers: this.state.selectedDataList
         }
         // 调用发送方函数, 处理部署操作
         this.props.handleDeploy(options)
@@ -220,16 +216,10 @@ class LotusHelp extends Component {
         this.setState({benchCeShiBtnModal: false})
     }
     handleBenchCeShiModalOk () {
-        /*
-        if (this.state.benchCeShiIptVal == '') {
-            Toast.fail('输入框不能为空 !');
-            return false
-        }
-        */
-
         let options = {
             name: 'benchrun',
-            process: this.state.benchCeShiIptVal
+            process: this.state.benchCeShiIptVal,
+            servers: this.state.selectedDataList
         }
         // 调用发送方函数, 处理部署
         this.props.handleDeploy(options)
@@ -243,16 +233,10 @@ class LotusHelp extends Component {
         this.setState({benchBianYiBtnModal: false})
     }
     handleBenchBianYiModalOk () {
-        /*
-        if (this.state.benchBianYiIptVal == '') {
-            Toast.fail('输入框不能为空 !');
-            return false
-        }
-        */
-
         let options = {
             name: 'benchcompile',
-            process: this.state.benchBianYiIptVal
+            process: this.state.benchBianYiIptVal,
+            servers: this.state.selectedDataList
         }
         // 调用发送方函数, 处理部署
         this.props.handleDeploy(options)
@@ -390,10 +374,10 @@ class LotusHelp extends Component {
                 this.setState({qiDongWorkerBtn: false})
             } else if (queryResName == 'workerrun') {
                 this.setState({lotuscompile: false})
-            } else if (queryResName == 'benchrun') {
-                this.setState({benchCompile: false})
             } else if (queryResName == 'benchcompile') {
                 this.setState({benchceshiBtn: false})
+            } else if (queryResName == 'benchrun') {
+                this.setState({benchCompile: false})
             }
             isOneRender = false
         } else if (isOneRender && queryResCode != 0 && queryResCode != 1 && queryResName != '') { // 执行失败 改变按钮状态
@@ -438,8 +422,8 @@ class LotusHelp extends Component {
                     ||
                     item.title == '测试' && (
                         <div>
-                            <div style={{ padding: '30px 0', display: 'flex', justifyContent: 'center' }}><Button style={{ marginTop: '20px auto', width: '150px' }} type="primary" size="small" onClick={() => this.handleDeployBtn('bench 测试')} disabled={this.state.benchceshiBtn}>bench 测试</Button></div>
                             <div style={{ padding: '30px 0', display: 'flex', justifyContent: 'center' }}><Button style={{ marginTop: '20px auto', width: '150px' }} type="primary" size="small" onClick={() => this.handleDeployBtn('bench 编译')} disabled={this.state.benchCompile}>bench 编译</Button></div>
+                            <div style={{ padding: '30px 0', display: 'flex', justifyContent: 'center' }}><Button style={{ marginTop: '20px auto', width: '150px' }} type="primary" size="small" onClick={() => this.handleDeployBtn('bench 测试')} disabled={this.state.benchceshiBtn}>bench 测试</Button></div>
                         </div>
                     )
                     ||
