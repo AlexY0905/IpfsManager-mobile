@@ -3,10 +3,12 @@
     overflow                  : auto;
     -webkit-overflow-scrolling: touch;
 }
+
 .am-drawer {
     position: fixed !important;
-    z-index: 999;
+    z-index : 999;
 }
+
 .my-drawer .am-drawer-sidebar {
     background-color          : #fff;
     overflow                  : auto;
@@ -19,18 +21,21 @@
 }
 
 .routeTxt {
-    color: #000000A6 !important;
+    color: #000 !important;
 }
 
 .activeTxt {
     color: #1890ff !important;
 }
-.am-drawer.am-drawer-left .am-drawer-draghandle, .am-drawer.am-drawer-right .am-drawer-draghandle {
+
+.am-drawer.am-drawer-left .am-drawer-draghandle,
+.am-drawer.am-drawer-right .am-drawer-draghandle {
     width: 0 !important;
 }
+
 .backTop_wrap {
     position: fixed;
-    bottom: 30px;
-    right: 50px;
-    z-index: 999;
+    bottom  : 30px;
+    right   : 50px;
+    z-index : 999;
 }

@@ -2,6 +2,7 @@
     text-align: right;
     height    : 50px;
 }
+
 /*.rate_wrap {*/
 /*    display: flex !important;*/
 /*    align-items: center;*/
@@ -13,20 +14,27 @@
 /*    flex: 1.5;*/
 /*}*/
 .rate_wrap .am-list-content {
-    display: flex !important;
+    display    : flex !important;
     align-items: center;
 }
+
 .rate_wrap .am-list-content .progress_wrap {
-    flex: 1;
+    flex       : 1;
     margin-left: 10px;
-    display: flex;
+    display    : flex;
     align-items: center;
 }
+
 .rate_wrap .am-list-content .progress_wrap .am-progress-outer {
     flex: 1.9;
 }
+
 .rate_wrap .am-list-content .progress_wrap .rate_num {
-    flex: 0.1;
-    font-size: 12px;
+    flex       : 0.1;
+    font-size  : 12px;
     margin-left: 3px;
+}
+
+.am-accordion .am-accordion-item .am-accordion-header {
+    background-color: #F0F0F0 !important;
 }

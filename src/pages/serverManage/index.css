@@ -1,12 +1,13 @@
 .handleBtn {
-    width: 80px;
-    margin-right: 5px;
-    background: #108ee9;
-    border: 1px solid #108ee9;
-    color: #fff;
+    width        : 80px;
+    margin-right : 5px;
+    background   : #108ee9;
+    border       : 1px solid #108ee9;
+    color        : #fff;
     border-radius: 5px;
-    font-size: 16px;
+    font-size    : 16px;
 }
+
 .newAddBtnWrap {
     text-align: right;
     height    : 40px;
@@ -24,12 +25,16 @@
 }
 
 #terminal {
-    width: 100%;
+    width : 100%;
     height: 100%;
 }
 
 .am-accordion-header {
     text-align: left !important;
+}
+
+.am-accordion .am-accordion-item .am-accordion-header {
+    background-color: #F0F0F0 !important;
 }
 
 /*
@@ -94,16 +99,16 @@
 *   other features.
 */
 
-    /**
+/**
      *  Default styles for xterm.js
      */
 
 .xterm {
-    font-feature-settings: "liga" 0;
-    position: relative;
-    user-select: none;
-    -ms-user-select: none;
-    -webkit-user-select: none;
+    font-feature-settings: "liga"0;
+    position             : relative;
+    user-select          : none;
+    -ms-user-select      : none;
+    -webkit-user-select  : none;
 }
 
 .xterm.focus,
@@ -113,12 +118,12 @@
 
 .xterm .xterm-helpers {
     position: absolute;
-    top: 0;
+    top     : 0;
     /**
      * The z-index of the helpers must be higher than the canvases in order for
      * IMEs to appear on top.
      */
-    z-index: 10;
+    z-index : 10;
 }
 
 .xterm .xterm-helper-textarea {
@@ -126,27 +131,27 @@
      * HACK: to fix IE's blinking cursor
      * Move textarea out of the screen to the far left, so that the cursor is not visible.
      */
-    position: absolute;
-    opacity: 0;
-    left: -9999em;
-    top: 0;
-    width: 0;
-    height: 0;
-    z-index: -10;
+    position   : absolute;
+    opacity    : 0;
+    left       : -9999em;
+    top        : 0;
+    width      : 0;
+    height     : 0;
+    z-index    : -10;
     /** Prevent wrapping so the IME appears against the textarea at the correct position */
     white-space: nowrap;
-    overflow: hidden;
-    resize: none;
+    overflow   : hidden;
+    resize     : none;
 }
 
 .xterm .composition-view {
     /* TODO: Composition position got messed up somewhere */
-    background: #000;
-    color: #FFF;
-    display: none;
-    position: absolute;
+    background : #000;
+    color      : #FFF;
+    display    : none;
+    position   : absolute;
     white-space: nowrap;
-    z-index: 1;
+    z-index    : 1;
 }
 
 .xterm .composition-view.active {
@@ -156,13 +161,13 @@
 .xterm .xterm-viewport {
     /* On OS X this is required in order for the scroll bar to appear fully opaque */
     background-color: #000;
-    overflow-y: scroll;
-    cursor: default;
-    position: absolute;
-    right: 0;
-    left: 0;
-    top: 0;
-    bottom: 0;
+    overflow-y      : scroll;
+    cursor          : default;
+    position        : absolute;
+    right           : 0;
+    left            : 0;
+    top             : 0;
+    bottom          : 0;
 }
 
 .xterm .xterm-screen {
@@ -171,8 +176,8 @@
 
 .xterm .xterm-screen canvas {
     position: absolute;
-    left: 0;
-    top: 0;
+    left    : 0;
+    top     : 0;
 }
 
 .xterm .xterm-scroll-area {
@@ -180,11 +185,11 @@
 }
 
 .xterm-char-measure-element {
-    display: inline-block;
-    visibility: hidden;
-    position: absolute;
-    top: 0;
-    left: -9999em;
+    display    : inline-block;
+    visibility : hidden;
+    position   : absolute;
+    top        : 0;
+    left       : -9999em;
     line-height: normal;
 }
 
@@ -209,19 +214,19 @@
 .xterm .xterm-accessibility,
 .xterm .xterm-message {
     position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    z-index: 100;
-    color: transparent;
+    left    : 0;
+    top     : 0;
+    bottom  : 0;
+    right   : 0;
+    z-index : 100;
+    color   : transparent;
 }
 
 .xterm .live-region {
     position: absolute;
-    left: -9999px;
-    width: 1px;
-    height: 1px;
+    left    : -9999px;
+    width   : 1px;
+    height  : 1px;
     overflow: hidden;
 }
 

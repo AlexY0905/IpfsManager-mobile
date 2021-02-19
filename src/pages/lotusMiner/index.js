@@ -2,14 +2,16 @@
 import React, { Component } from 'react'
 import { NavLink } from "react-router-dom"
 import { connect } from 'react-redux'
-import { Modal, NavBar, Icon, SearchBar, Tabs, List, Toast, Button, Accordion } from 'antd-mobile';
+import { Modal, NavBar, Icon, SearchBar, Tabs, List, Toast, Button, Accordion, InputItem } from 'antd-mobile';
 import "./index.css"
 import HomeSider from 'common/sider/index'
 import { actionCreator } from './store'
 import { Tooltip, Chart, Geom, Axis, Legend } from 'bizcharts';
+import Input from 'antd-mobile/lib/input-item/Input';
 
 
 const Item = List.Item;
+const alert = Modal.alert;
 
 let timer = null
 class LotusHelp extends Component {
@@ -23,13 +25,17 @@ class LotusHelp extends Component {
             modalOrder: '',
             isShowSearch: false,
             isSearchShow: false,
-            searchText: ''
+            searchText: '',
+            tiBiVisible: false,
+            tiBiNumber: ''
         }
         this.onOpenChange = this.onOpenChange.bind(this)
         this.handleServerBtn = this.handleServerBtn.bind(this)
         this.handleSearchBtn = this.handleSearchBtn.bind(this)
         this.handleTabsOnChange = this.handleTabsOnChange.bind(this)
-
+        this.onChangeTiBi = this.onChangeTiBi.bind(this)
+        this.handleTiBiOk = this.handleTiBiOk.bind(this)
+        this.onCloseTiBi = this.onCloseTiBi.bind(this)
     }
     componentDidMount() {
         // 在生命周期调用发送方的数据, 处理minerInfo数据
@@ -77,6 +83,11 @@ class LotusHelp extends Component {
                     isShowSearch: true
                 })
                 return false
+            case '提币':
+                this.setState({
+                    tiBiVisible: true
+                })
+                return false
         }
 
         // 调用发送方函数, 处理lotus命令
@@ -112,6 +123,41 @@ class LotusHelp extends Component {
         console.log('============', item)
         this.setState({ isShowSearch: false })
     }
+    onChangeTiBi(val) {
+        this.setState({
+            tiBiNumber: val
+        })
+    }
+    handleTiBiOk() {
+        let _this = this
+        if (this.state.tiBiNumber == '') {
+            Toast.fail('输入框不能为空 !')
+            return false
+        }
+        alert('确定要进行提币吗 ?', '', [
+            { text: 'Cancel', onPress: () => console.log('cancel') },
+            {
+                text: 'Ok', onPress: () => {
+                    let options = {
+                        name: 'withdrawbalance',
+                        num: _this.state.tiBiNumber
+                    }
+                    // 调用发送方函数, 处理提币按钮
+                    _this.props.handleTiBiData(options)
+                    _this.setState({ tiBiVisible: false })
+                }
+            },
+        ])
+        this.setState({
+            tiBiVisible: false
+        })
+    }
+    onCloseTiBi() {
+        this.setState({
+            tiBiVisible: false
+        })
+    }
+
 
 
 
@@ -120,7 +166,8 @@ class LotusHelp extends Component {
         const tabs = [ // 选项卡切换
             { title: '存储交易' },
             { title: '片信息' },
-            { title: '区块信息' }
+            { title: '区块信息' },
+            { title: '提币' }
         ];
         let renderContent = tabs.map((item, index) => (
             <div key={index} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '150px', backgroundColor: '#fff' }}>
@@ -143,6 +190,12 @@ class LotusHelp extends Component {
                             <Button style={{ width: '100px' }} type="primary" size="small" onClick={() => this.handleServerBtn('status')}>status</Button>
                         </div>
                     )
+                    ||
+                    item.title == '提币' && (
+                        <div style={{ width: '100%', display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
+                            <Button style={{ width: '100px' }} type="primary" size="small" onClick={() => this.handleServerBtn('提币')}>提币</Button>
+                        </div>
+                    )
                 }
             </div>
         ))
@@ -150,7 +203,7 @@ class LotusHelp extends Component {
         if (lotusminerlist.toJS().length > 0) {
             if (name == 'lotusminerstoragedealslist') {
                 listHtml = lotusminerlist.toJS().map((item, index) => (
-                    <Accordion defaultActiveKey="0" className="my-accordion">
+                    <Accordion defaultActiveKey="0" className="my-accordion" style={{ marginBottom: '10px' }}>
                         <Accordion.Panel header={`ProposalCid: ${item.proposalCid}`}>
                             <List className="my-list">
                                 <List.Item><span>ProposalCid : </span><span>{item.proposalCid}</span></List.Item>
@@ -166,7 +219,7 @@ class LotusHelp extends Component {
                 ))
             } else if (name == 'lotusminerstoragedealsgetask' && type) {
                 listHtml = lotusminerlist.toJS().map((item, index) => (
-                    <Accordion defaultActiveKey="0" className="my-accordion">
+                    <Accordion defaultActiveKey="0" className="my-accordion" style={{ marginBottom: '10px' }}>
                         <Accordion.Panel header={`Expiry: ${item.ask}`}>
                             <List className="my-list">
                                 <List.Item><span>Ask : </span><span>{item.ask}</span></List.Item>
@@ -184,7 +237,7 @@ class LotusHelp extends Component {
                 ))
             } else if (name == 'lotusminerpiecescidinfo' && type) {
                 listHtml = lotusminerlist.toJS().map((item, index) => (
-                    <Accordion defaultActiveKey="0" className="my-accordion">
+                    <Accordion defaultActiveKey="0" className="my-accordion" style={{ marginBottom: '10px' }}>
                         <Accordion.Panel header={`cid-info`}>
                             <List className="my-list">
                                 <List.Item><span>Id : </span><span>{item.id}</span></List.Item>
@@ -198,7 +251,7 @@ class LotusHelp extends Component {
                 ))
             } else if (name == 'lotusminersectorsstatus' && type) {
                 listHtml = lotusminerlist.toJS().map((item, index) => (
-                    <Accordion defaultActiveKey="0" className="my-accordion">
+                    <Accordion defaultActiveKey="0" className="my-accordion" style={{ marginBottom: '10px' }}>
                         <Accordion.Panel header={`status`}>
                             <List className="my-list">
                                 <List.Item><span>SectorID : </span><span>{item.SectorID}</span></List.Item>
@@ -224,7 +277,7 @@ class LotusHelp extends Component {
         let minerInfoHtml = null
         if (lotusMinerInfo.toJS().length > 0) {
             minerInfoHtml = lotusMinerInfo.toJS().map((item, index) => (
-                <Accordion defaultActiveKey="0" className="my-accordion">
+                <Accordion defaultActiveKey="0" className="my-accordion" style={{ marginBottom: '10px' }}>
                     <Accordion.Panel header='minerInfo'>
                         <List className="my-list">
                             <List.Item><span>{Object.keys(item)} : </span><span>{Object.values(item)}</span></List.Item>
@@ -264,6 +317,24 @@ class LotusHelp extends Component {
                                 {minerInfoHtml != null && minerInfoHtml}
                             </List>
                         </div>
+                        <Modal
+                            transparent={true}
+                            visible={this.state.tiBiVisible}
+                            onClose={this.onCloseTiBi}
+                            animationType="slide-up"
+                            afterClose={() => { console.log('afterClose') }}
+                        >
+                            <div>
+                                <List renderHeader={() => <div>添加机器</div>} className="popup-list">
+                                    <List.Item>
+                                        <InputItem placeholder="输入提币的数量" onChange={this.onChangeTiBi} style={{ fontSize: '15px' }}></InputItem>
+                                    </List.Item>
+                                    <List.Item>
+                                        <Button type="primary" size="small" onClick={this.handleTiBiOk}>添加</Button>
+                                    </List.Item>
+                                </List>
+                            </div>
+                        </Modal>
                     </div>
                 </div>
             </div>
@@ -290,6 +361,9 @@ const mapDispatchToProps = (dispatch) => ({
     },
     handleMinerInfo: () => {
         dispatch(actionCreator.handleMinerInfoAction())
+    },
+    handleTiBiData: (options) => {
+        dispatch(actionCreator.handleTiBiDataAction(options))
     }
 })
 

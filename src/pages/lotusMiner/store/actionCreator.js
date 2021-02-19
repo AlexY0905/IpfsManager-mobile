@@ -67,12 +67,33 @@ export const handleMinerInfoAction = () => {
                 console.log('result---------', result)
                 let data = []
                 for (let key in result.msg) {
-                    data.push({[key]: result.msg[key]})
+                    data.push({ [key]: result.msg[key] })
                 }
                 dispatch(handleMinerInfoData(data))
             })
             .catch((err) => {
-                message.error('获取数据失败, 请稍后再试 !')
+                Toast.fail('获取数据失败, 请稍后再试 !')
+            })
+            .finally(() => {
+                dispatch(getIsLoadingEnd())
+            })
+    }
+}
+// 处理提币
+export const handleTiBiDataAction = (options) => {
+    return (dispatch, getState) => {
+        dispatch(getIsLoadingStart())
+        api.getTiBiData(options)
+            .then((result) => {
+                console.log('result---------', result)
+                if (result.msg && result.msg == 'balance invalid') {
+                    Toast.fail(result.msg)
+                } else {
+                    Toast.success(result.msg)
+                }
+            })
+            .catch((err) => {
+                Toast.fail('获取数据失败, 请稍后再试 !')
             })
             .finally(() => {
                 dispatch(getIsLoadingEnd())

@@ -35,7 +35,7 @@ class Monitor extends Component {
         let { monitorList } = this.props
         let monitorDataList = monitorList.toJS().map((item, index) => {
             return (
-                <Accordion defaultActiveKey="0" className="my-accordion">
+                <Accordion className="my-accordion" style={{marginBottom: '10px'}}>
                     <Accordion.Panel header={`IP ${item.ip}`}>
                         <List className="my-list">
                             <List.Item><span>hostname : </span><span>{item.hostname}</span></List.Item>

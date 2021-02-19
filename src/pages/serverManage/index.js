@@ -1,4 +1,4 @@
-// 添加账户页面
+// 资产管理页面
 import React, { Component } from 'react'
 import { NavLink } from "react-router-dom"
 import { connect } from 'react-redux'
@@ -364,7 +364,7 @@ class ServerManage extends Component {
         let { serverlist } = this.props
         let serverDataList = serverlist.toJS().map((item, index) => {
             return (
-                <Accordion defaultActiveKey="0" className="my-accordion">
+                <Accordion defaultActiveKey="0" className="my-accordion" style={{ marginBottom: '10px' }}>
                     <Accordion.Panel header={`IP ${item.host}`}>
                         <List className="my-list">
                             <List.Item><span>名 称 : </span><span>{item.name}</span></List.Item>
