@@ -330,7 +330,7 @@ class LotusHelp extends Component {
                                         <InputItem placeholder="输入提币的数量" onChange={this.onChangeTiBi} style={{ fontSize: '15px' }}></InputItem>
                                     </List.Item>
                                     <List.Item>
-                                        <Button type="primary" size="small" onClick={this.handleTiBiOk}>添加</Button>
+                                        <Button type="primary" size="small" onClick={this.handleTiBiOk}>确认</Button>
                                     </List.Item>
                                 </List>
                             </div>
